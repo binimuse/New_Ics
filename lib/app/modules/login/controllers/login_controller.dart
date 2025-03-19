@@ -86,6 +86,8 @@ class LoginController extends GetxController {
       SignInResponse signInResponse = await _attemptSignIn(phoneNumber);
       await _handleSignInResponse(signInResponse);
     } catch (e, s) {
+      print(e);
+      print(s);
       _handleException(e, s);
     }
   }
@@ -137,7 +139,16 @@ class LoginController extends GetxController {
       if (message is Map && message.containsKey("message")) {
         AppToasts.showError(message["message"].toString());
       } else {
-        AppToasts.showError(message.toString());
+        if (message == "Phone number is not verified") {
+          AppToasts.showError(message.toString());
+          Get.toNamed(
+            Routes.OTP_VARIFICATION,
+            arguments: {
+              "phone": countryCode.toString() + phoneController.text,
+              "isFromForgot": false,
+            },
+          );
+        }
       }
     }
   }

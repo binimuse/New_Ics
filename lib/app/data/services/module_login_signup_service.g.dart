@@ -13,7 +13,7 @@ class _LoginSignupService implements LoginSignupService {
     this._dio, {
     this.baseUrl,
   }) {
-    baseUrl ??= 'https://api.iftms.motl.gov.et';
+    baseUrl ??= 'http://5.75.142.45:4000';
   }
 
   final Dio _dio;
@@ -73,6 +73,64 @@ class _LoginSignupService implements LoginSignupService {
               baseUrl,
             ))));
     final value = SignUpResponse.fromJson(_result.data!);
+    return value;
+  }
+
+  @override
+  Future<VerifyResponse> verifyOTP(
+      {required VerifyRequest verifyRequest}) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    _data.addAll(verifyRequest.toJson());
+    final _result = await _dio
+        .fetch<Map<String, dynamic>>(_setStreamType<VerifyResponse>(Options(
+      method: 'POST',
+      headers: _headers,
+      extra: _extra,
+    )
+            .compose(
+              _dio.options,
+              '/auth/verify-user-otp',
+              queryParameters: queryParameters,
+              data: _data,
+            )
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
+    final value = VerifyResponse.fromJson(_result.data!);
+    return value;
+  }
+
+  @override
+  Future<ResendResponse> resendOTP(
+      {required ResendRequest resendRequest}) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    _data.addAll(resendRequest.toJson());
+    final _result = await _dio
+        .fetch<Map<String, dynamic>>(_setStreamType<ResendResponse>(Options(
+      method: 'POST',
+      headers: _headers,
+      extra: _extra,
+    )
+            .compose(
+              _dio.options,
+              '/auth/generate-reset-password-otp',
+              queryParameters: queryParameters,
+              data: _data,
+            )
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
+    final value = ResendResponse.fromJson(_result.data!);
     return value;
   }
 

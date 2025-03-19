@@ -107,7 +107,7 @@ class SignupView extends GetView<SignupController> {
                   SizedBox(height: 2.h),
                   _buildEmailInput(),
                   SizedBox(height: 2.h),
-                  _buildPinInput(),
+                  _buildPasswordInput(),
                   SizedBox(height: 2.h),
                 ],
               ),
@@ -141,12 +141,15 @@ class SignupView extends GetView<SignupController> {
     );
   }
 
-  Widget _buildPinInput() {
+  Widget _buildPasswordInput() {
     return TextInputSignup(
-      hint: 'Pin'.tr,
-      maxLength: 6,
-      moreInstructions: ["Maximum  6 digits".tr, "Only Numbers".tr],
-      keyboardType: TextInputType.number,
+      hint: 'Password'.tr,
+      maxLength: 20,
+      moreInstructions: [
+        "Minimum 8 characters".tr,
+        "Include letters and numbers".tr,
+      ],
+      keyboardType: TextInputType.text,
       isPassword: true,
       onChanged: (value) {
         bool isValid = controller.validatePassword();
@@ -154,10 +157,11 @@ class SignupView extends GetView<SignupController> {
       },
       validator: (value) {
         if (value!.isEmpty) {
-          return 'Please enter your pin'.tr;
+          return 'Please enter your password'.tr;
         }
         if (!controller.isPasswordValid.value) {
-          return 'Pin must be 6'.tr;
+          return 'Password must be at least 8 characters and include letters and numbers'
+              .tr;
         }
         return null;
       },

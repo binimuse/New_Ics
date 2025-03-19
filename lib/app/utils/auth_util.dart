@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:new_ics/app/utils/constants.dart';
 import 'package:new_ics/app/utils/validator_util.dart';
@@ -12,7 +11,6 @@ class AuthUtil {
   }) async {
     const storage = FlutterSecureStorage();
     await storage.write(key: Constants.accessToken, value: accessToken);
-
     await storage.write(key: Constants.refreshToken, value: refreshToken);
     await storage.write(key: Constants.userData, value: jsonEncode(user));
   }
@@ -32,9 +30,7 @@ class AuthUtil {
   Future<Map<String, dynamic>> getUserData() async {
     const storage = FlutterSecureStorage();
     String? userData = await storage.read(key: Constants.userData);
-
     Map<String, dynamic> userDataMap = json.decode(userData!);
-
     return userDataMap;
   }
 
@@ -44,37 +40,22 @@ class AuthUtil {
     return id;
   }
 
-  Future<int> getLicenseApplicationId() async {
-    Map<String, dynamic> userDataMap = await getUserData();
-    int id =
-        userDataMap.containsKey('licenseApplication') && userDataMap.isNotEmpty
-            ? userDataMap['licenseApplication']['id']
-            : userDataMap['licenseApplication']['id'];
-    return id;
-  }
-
-  Future<String> getUserLicencesApplicationId() async {
-    Map<String, dynamic> userDataMap = await getUserData();
-    String id = userDataMap['id'].toString();
-    return id;
-  }
-
   Future<bool> isUserPhoneVerified() async {
     Map<String, dynamic> userDataMap = await getUserData();
-    bool isPhoneVerified = userDataMap['phone_verified'];
+    bool isPhoneVerified = userDataMap['phone_otp_verified'];
     return isPhoneVerified;
   }
 
-  Future<String> getUserPhoneVerified() async {
+  Future<String> getUserPhone() async {
     Map<String, dynamic> userDataMap = await getUserData();
-    String phone = userDataMap['phone'];
+    String phone = userDataMap['username'];
     return phone;
   }
 
-  updateUserPhoneNumber(newPhone) async {
+  updateUserPhoneNumber(String newPhone) async {
     Map<String, dynamic> userDataMap = await getUserData();
-    userDataMap['phone'] = ValidatorUtil.formatPhoneNumber(newPhone, true);
-    userDataMap['phone_verified'] = true;
+    userDataMap['username'] = ValidatorUtil.formatPhoneNumber(newPhone, true);
+    userDataMap['phone_otp_verified'] = true;
 
     const storage = FlutterSecureStorage();
     await storage.write(

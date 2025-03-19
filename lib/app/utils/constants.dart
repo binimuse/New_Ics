@@ -1,7 +1,7 @@
 class Constants {
   //base url
   ///URLS
-  static const baseUrl = "https://api.iftms.motl.gov.et";
+  static const baseUrl = "http://5.75.142.45:4000";
   //language
   static const String selectedLanguage = "SELECTED_LANGUAGE";
   static const String lanAm = "am";
@@ -22,6 +22,8 @@ class Constants {
   //login
   static const signInUrl = "/auth/phone/login";
   static const signupuUrl = "/auth/phone/signup";
+  static const verifyuUrl = "/auth/verify-user-otp";
+  static const resendUrl = "/auth/generate-reset-password-otp";
   static const refersh = "/auth/refresh";
   static const me = "/auth/me";
   static const generateresetpasswordotp = "/auth/generate-reset-password-otp";

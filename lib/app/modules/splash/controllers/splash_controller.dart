@@ -1,10 +1,9 @@
 import 'package:get/get.dart';
 import 'package:new_ics/app/common/app_toasts.dart';
 import 'package:new_ics/app/routes/app_pages.dart';
+import 'package:new_ics/app/utils/auth_util.dart';
 import 'package:new_ics/app/utils/constants.dart';
-import 'package:new_ics/app/utils/encryption.dart';
 import 'package:new_ics/gen/assets.gen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class SplashController extends GetxController {
@@ -12,8 +11,7 @@ class SplashController extends GetxController {
 
   @override
   void onInit() {
-    checkifSignedin();
-
+    checkIfSignedIn();
     super.onInit();
   }
 
@@ -27,7 +25,7 @@ class SplashController extends GetxController {
           await requestNotificationPermission();
 
       if (notificationPermissionStatus == PermissionStatus.granted) {
-        checkifSignedin();
+        checkIfSignedIn();
         break;
       } else {
         if (!hasShownToast) {
@@ -44,26 +42,17 @@ class SplashController extends GetxController {
     return status;
   }
 
-  void checkifSignedin() async {
-    final prefs = await SharedPreferences.getInstance();
-
-    if (prefs.getString(Constants.userAccessTokenKey) != null) {
-      var acc = EncryptionUtil.decrypt(
-        prefs.getString(Constants.userAccessTokenKey),
-      );
-
-      print(acc);
-
-      final verifyEmail = prefs.getString(Constants.verifyEmail);
-      final id = prefs.getString(Constants.userId);
-
-      if (acc == null && verifyEmail == null) {
+  void checkIfSignedIn() async {
+    final accessToken = await AuthUtil().getAccessToken();
+    if (accessToken != null) {
+      final isPhoneVerified = await AuthUtil().isUserPhoneVerified();
+      if (isPhoneVerified) {
         Future.delayed(const Duration(seconds: 1), () {
-          Get.toNamed(Routes.ON_BORDING);
+          Get.toNamed(Routes.MAIN_PAGE);
         });
       } else {
         Future.delayed(const Duration(seconds: 1), () {
-          Get.toNamed(Routes.MAIN_PAGE);
+          Get.toNamed(Routes.ON_BORDING);
         });
       }
     } else {

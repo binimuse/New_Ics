@@ -4,9 +4,11 @@ import 'package:new_ics/app/data/models/login/deactivate_account.dart';
 import 'package:new_ics/app/data/models/login/generate_reset_password_otp.dart';
 import 'package:new_ics/app/data/models/login/me.dart';
 import 'package:new_ics/app/data/models/login/refresh_token.dart';
+import 'package:new_ics/app/data/models/login/resend_otp.dart';
 import 'package:new_ics/app/data/models/login/reset_password.dart';
 import 'package:new_ics/app/data/models/login/sign_in.dart';
 import 'package:new_ics/app/data/models/login/sign_up.dart';
+import 'package:new_ics/app/data/models/login/verify_otp.dart';
 import 'package:new_ics/app/utils/constants.dart';
 
 import 'package:retrofit/retrofit.dart';
@@ -22,6 +24,16 @@ abstract class LoginSignupService {
 
   @POST(Constants.signupuUrl)
   Future<SignUpResponse> signUp({@Body() required SignUpRequest signUpRequest});
+
+  @POST(Constants.verifyuUrl)
+  Future<VerifyResponse> verifyOTP({
+    @Body() required VerifyRequest verifyRequest,
+  });
+
+  @POST(Constants.resendUrl)
+  Future<ResendResponse> resendOTP({
+    @Body() required ResendRequest resendRequest,
+  });
 
   @POST(Constants.refersh)
   Future<TokenRefreshResponse> refreshToken({

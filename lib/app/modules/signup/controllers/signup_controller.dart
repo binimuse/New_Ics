@@ -118,13 +118,20 @@ class SignupController extends GetxController {
         ),
       );
 
-      Get.toNamed(
-        Routes.OTP_VARIFICATION,
-        arguments: {
-          "phone": countryCode.toString() + phoneController.text,
-          "isFromForgot": false,
-        },
-      );
+      if (signInResponse.message == "Account Created!") {
+        networkStatus.value = NetworkStatus.SUCCESS;
+        // Check if the response is successful
+        Get.toNamed(
+          Routes.OTP_VARIFICATION,
+          arguments: {
+            "phone": countryCode.toString() + phoneController.text,
+            "isFromForgot": false,
+          },
+        );
+      } else {
+        networkStatus.value = NetworkStatus.ERROR;
+        AppToasts.showError(signInResponse.message ?? "Sign up failed");
+      }
     } catch (e) {
       networkStatus.value = NetworkStatus.ERROR;
       AppToasts.showError(e.toString());

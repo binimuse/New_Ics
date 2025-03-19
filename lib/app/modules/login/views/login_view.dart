@@ -113,11 +113,45 @@ class LoginView extends GetView<LoginController> {
               () =>
                   controller.isNextPressed.value ||
                           controller.passwordController.text.isNotEmpty
-                      ? buildPinInput()
+                      ? buildPasswordInput()
                       : SizedBox(),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget buildPasswordInput() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 19.0),
+      child: TextInputSignup(
+        hint: 'Password'.tr,
+        moreInstructions: [
+          "Minimum 6 characters".tr,
+          "Include letters and numbers".tr,
+        ],
+        keyboardType: TextInputType.text,
+        isPassword: true,
+        onChanged: (value) {
+          bool isValid = controller.validatePassword();
+          controller.isPasswordValid.value = isValid;
+        },
+        validator: (value) {
+          if (value!.isEmpty) {
+            return 'Please enter your password'.tr;
+          }
+          if (value.length < 6) {
+            return 'Password must be at least 6 characters'.tr;
+          }
+          if (!controller.isPasswordValid.value) {
+            return 'Invalid password'.tr;
+          }
+          return null;
+        },
+        controller: controller.passwordController,
+        autofocus: false,
+        focusNode: controller.passwordFocusNode,
       ),
     );
   }
@@ -361,7 +395,7 @@ class LoginView extends GetView<LoginController> {
         padding: EdgeInsets.symmetric(vertical: 1.h),
         child: Center(
           child: Text(
-            "Find Pin".tr,
+            "Find Password".tr,
             style: AppTextStyles.bodySmallUnderlineRegular.copyWith(
               color: AppColors.primary,
             ),
