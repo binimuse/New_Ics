@@ -6,7 +6,7 @@ import 'package:new_ics/app/common/button/custom_normal_button.dart';
 import 'package:new_ics/app/common/loading/custom_loading_widget.dart';
 import 'package:new_ics/app/data/enums.dart';
 import 'package:new_ics/app/modules/new_passport/views/widget/urgency/appointemnt_class.dart';
-import 'package:new_ics/app/modules/new_passport/views/widget/urgency/passport_page_size.dart';
+import 'package:new_ics/app/modules/new_passport/views/widget/urgency/delivery_page.dart';
 import 'package:new_ics/app/modules/new_passport/views/widget/urgency/urgency_type_form_selection.dart';
 import 'package:new_ics/app/routes/app_pages.dart';
 import 'package:new_ics/app/theme/app_colors.dart';
@@ -118,10 +118,7 @@ class _NextButton extends StatelessWidget {
           color: AppColors.whiteOff,
         ),
         textcolor: AppColors.whiteOff,
-        buttoncolor:
-            controller.selectedUrgencyType.value == null
-                ? AppColors.grayLight
-                : AppColors.primary,
+        buttoncolor: _isFormValid() ? AppColors.primary : AppColors.grayLight,
         borderRadius: AppSizes.radius_8,
         padding: EdgeInsets.symmetric(
           vertical: AppSizes.mp_v_2,
@@ -151,81 +148,57 @@ class _NextButton extends StatelessWidget {
         return;
       }
 
-      if (!controller.isPhoneValid.value) {
-        AppToasts.showError("Phone number is not valid".tr);
+      if (controller.pagesizeValuevalue.value == null) {
+        AppToasts.showError("Please select Passport Page Size".tr);
+        return;
+      }
+
+      if (controller.displayedPrice.value.isEmpty) {
+        AppToasts.showError("Price information is not available".tr);
         return;
       }
 
       // Navigate based on urgency type selection
-      if (_isUrgentSelectionValid()) {
-        Get.to(() => PassportPageSize(controller: controller));
-      } else if (_isOrdinarySelectionValid()) {
-        Get.to(() => AppointmentStep());
-      } else if (_isSpecialSelectionValid()) {
-        Get.to(() => PassportPageSize(controller: controller));
+      if (controller.isDeliveryRequired.value == true) {
+        Get.to(() => DeliveryPage(controller: controller));
+        // Navigate based on urgency type selection
       } else {
-        _showSpecificFieldErrors();
+        Get.to(() => AppointmentStep());
       }
     } else {
       AppToasts.showError("Please fill all required fields".tr);
     }
   }
 
-  void _showSpecificFieldErrors() {
-    if (controller.addressController.text.isEmpty) {
-      AppToasts.showError("Address is required".tr);
-    }
-    if (controller.collactioncountry.value == null) {
-      AppToasts.showError("Collection country is required".tr);
-    }
-    if (controller.embassiesvalue.value == null) {
-      AppToasts.showError("Embassy selection is required".tr);
-    }
-    if (!controller.isPhoneValid.value) {
-      AppToasts.showError("Phone number is not valid".tr);
-    }
-
-    if (controller.selectedUrgencyType.value!.nameJson!.en == 'Special') {
-      if (controller.houseNumberforDeleivery.text.isEmpty) {
-        AppToasts.showError("House number for delivery is required".tr);
-      }
-      if (controller.deliveryAddress.text.isEmpty) {
-        AppToasts.showError("Delivery address is required".tr);
-      }
-    }
-  }
-
-  bool _isUrgentSelectionValid() {
-    // Check if selected urgency type is either 'Urgent 5 days' or 'Urgent 2 days'
-    bool isUrgentType =
-        controller.selectedUrgencyType.value!.nameJson!.en == 'Urgent 5 days' ||
-        controller.selectedUrgencyType.value!.nameJson!.en == 'Urgent 2 days' ||
-        controller.selectedUrgencyType.value!.nameJson!.en == 'Urgent 15 days';
-
-    // Validate if required fields for Urgent type are filled
-    return isUrgentType && _isBasicDetailsFilled();
-  }
-
-  bool _isOrdinarySelectionValid() {
-    return controller.selectedUrgencyType.value!.id ==
-            'e36282a6-3687-4b8c-b558-a6c51f72db13' ||
-        controller.selectedUrgencyType.value!.id ==
-                '23d3bc45-1e42-420d-b34c-878a19fc459b' &&
-            _isBasicDetailsFilled();
-  }
-
-  bool _isSpecialSelectionValid() {
-    return controller.selectedUrgencyType.value!.nameJson!.en == 'Special' &&
-        controller.houseNumberforDeleivery.text.isNotEmpty &&
-        controller.collactioncountry.value != null &&
-        controller.deliveryAddress.text.isNotEmpty &&
-        controller.phonenumber.text.isNotEmpty;
-  }
-
-  bool _isBasicDetailsFilled() {
-    return controller.addressController.text.isNotEmpty &&
+  bool _isFormValid() {
+    return controller.selectedUrgencyType.value != null &&
         controller.collactioncountry.value != null &&
         controller.embassiesvalue.value != null &&
-        controller.phonenumber.text.isNotEmpty != null;
+        controller.pagesizeValuevalue.value != null &&
+        controller.displayedPrice.value.isNotEmpty;
   }
+
+  // void _showSpecificFieldErrors() {
+  //   if (controller.addressController.text.isEmpty) {
+  //     AppToasts.showError("Address is required".tr);
+  //   }
+  //   if (controller.collactioncountry.value == null) {
+  //     AppToasts.showError("Collection country is required".tr);
+  //   }
+  //   if (controller.embassiesvalue.value == null) {
+  //     AppToasts.showError("Embassy selection is required".tr);
+  //   }
+  //   if (!controller.isPhoneValid.value) {
+  //     AppToasts.showError("Phone number is not valid".tr);
+  //   }
+
+  //   if (controller.selectedUrgencyType.value!.nameJson!.en == 'Special') {
+  //     if (controller.houseNumberforDeleivery.text.isEmpty) {
+  //       AppToasts.showError("House number for delivery is required".tr);
+  //     }
+  //     if (controller.deliveryAddress.text.isEmpty) {
+  //       AppToasts.showError("Delivery address is required".tr);
+  //     }
+  //   }
+  // }
 }

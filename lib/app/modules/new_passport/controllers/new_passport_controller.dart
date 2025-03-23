@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:get/get.dart';
@@ -13,6 +15,8 @@ import 'package:new_ics/app/data/models/passport/passport_urgency_type.dart';
 import 'package:new_ics/app/data/services/module_passport_service.dart';
 import 'package:new_ics/app/utils/dio_util.dart';
 import 'package:new_ics/app/utils/validator_util.dart';
+
+import 'package:file_picker/file_picker.dart';
 
 class NewPassportController extends GetxController {
   Rx<NetworkStatus> networkStatus = Rx(NetworkStatus.IDLE);
@@ -60,7 +64,7 @@ class NewPassportController extends GetxController {
   List<CommonModel> gender = [];
   List<CommonModel> occupations = [];
   List<CommonModel> familytype = [];
-  List<CommonModel> bcountries = [];
+  List<BaseCountry> bcountries = [];
   List<CommonModel> natinality = [];
   List<CommonModel> haircolor = [];
   List<CommonModel> eyecolor = [];
@@ -77,6 +81,7 @@ class NewPassportController extends GetxController {
   void onInit() {
     getPassportType();
     getBaseCountry();
+    getPassportPageSize();
     super.onInit();
   }
 
@@ -184,10 +189,19 @@ class NewPassportController extends GetxController {
           response.where((type) => type.draft == false).toList();
 
       networkStatus.value = NetworkStatus.SUCCESS;
+      updateDisplayedPrice();
     } catch (e) {
       print(e);
       networkStatus.value = NetworkStatus.ERROR;
       ValidatorUtil.handleError(e);
+    }
+  }
+
+  void updateDisplayedPrice() {
+    if (collactioncountry.value!.name == "Ethiopia") {
+      displayedPrice.value = basePassportPrice.first.price_etb.toString();
+    } else {
+      displayedPrice.value = basePassportPrice.first.price_usd.toString();
     }
   }
 
@@ -240,9 +254,9 @@ class NewPassportController extends GetxController {
           await PassportService(
             DioUtil().getDio(useAccessToken: true),
           ).getPassportPageSize();
-
+      //ToDO: change this to  response.where((type) => type.draft == false).toList();
       basePassportPageSize.value =
-          response.where((type) => type.draft == false).toList();
+          response.where((type) => type.draft != false).toList();
 
       networkStatus.value = NetworkStatus.SUCCESS;
     } catch (e) {
@@ -306,7 +320,7 @@ class NewPassportController extends GetxController {
 
   Rxn<Basemodel> baseData = Rxn<Basemodel>();
   //Rxn<BookedDate> bookedDate = Rxn<BookedDate>();
-  Rxn<CommonModel> birthCountryvalue = Rxn<CommonModel>();
+  Rxn<BaseCountry> birthCountryvalue = Rxn<BaseCountry>();
   Rxn<CommonModel> natinalityvalue = Rxn<CommonModel>();
   Rxn<CommonModel> familynatinalityvalue = Rxn<CommonModel>();
   Rxn<BaseEmbassies> embassiesvalue = Rxn<BaseEmbassies>();
@@ -335,6 +349,36 @@ class NewPassportController extends GetxController {
   RxBool isfechedregions = false.obs;
   RxBool setFetchedStatus = false.obs;
   RxBool isDeliveryRequired = false.obs;
+
+  //form
+  RxInt currentStep = 0.obs;
+  RxList<File> selectedImages = <File>[].obs;
+  List<PassportDocuments> documents = [];
+  RxList<FamilyModel> familyModelvalue = RxList<FamilyModel>();
+  RxList<String> photoPath = <String>[].obs;
+  List<String> contentTexts = [
+    'Size of the image/document should be less than 2MB.'.tr,
+    'Photo and Passport Copy should be only in Image file type of JPEG, JPG, PNG format.'
+        .tr,
+    'Allowed Images/documents file type extensions are JPEG, JPG, PNG and PDF format only.'
+        .tr,
+    'An image/document with blurred or unclean background is not acceptable.'
+        .tr,
+    'Please use the below Screenshot for Photograph Tips.'.tr,
+  ];
+  List<DocPathModel> docList = [];
+  void addtoDocumants(CommonModel pas) {
+    print(documents.length);
+    base_document_types.add(pas);
+  }
+
+  void removeFromDocumants(CommonModel pas) {
+    base_document_types.removeWhere((element) => element.id == pas.id);
+  }
+
+  void sendPassportData() {}
+
+  void deleteDoc(String? id) {}
 }
 
 class BaseInstruction {
@@ -342,4 +386,11 @@ class BaseInstruction {
   final String description;
 
   BaseInstruction({required this.title, required this.description});
+}
+
+class PassportDocuments {
+  final documentTypeId;
+  final List<PlatformFile> files;
+
+  const PassportDocuments({required this.documentTypeId, required this.files});
 }

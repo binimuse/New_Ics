@@ -2,6 +2,8 @@ class Constants {
   //base url
   ///URLS
   static const baseUrl = "http://5.75.142.45:4000";
+  static const String fileUploader =
+      'http://5.75.142.45:3002/direct-single-file-upload';
   //language
   static const String selectedLanguage = "SELECTED_LANGUAGE";
   static const String lanAm = "am";

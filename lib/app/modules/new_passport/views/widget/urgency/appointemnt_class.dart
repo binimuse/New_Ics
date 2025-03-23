@@ -8,6 +8,7 @@ import 'package:new_ics/app/common/custom_callender.dart';
 import 'package:new_ics/app/common/loading/custom_loading_widget.dart';
 import 'package:new_ics/app/data/enums.dart';
 import 'package:new_ics/app/modules/new_passport/controllers/new_passport_controller.dart';
+import 'package:new_ics/app/modules/new_passport/views/widget/form/new_passport_form.dart';
 import 'package:new_ics/app/routes/app_pages.dart';
 import 'package:new_ics/app/theme/app_colors.dart';
 import 'package:new_ics/app/theme/app_sizes.dart';
@@ -117,7 +118,7 @@ class AppointmentStep extends StatelessWidget {
         ),
         onPressed: () {
           if (isButtonEnabled) {
-            //   Get.to(() => PassportPageSize(controller: controller));
+            Get.to(() => NewPassportForm());
           }
         }, // Provide null when the button is disabled
       );

@@ -14,7 +14,7 @@ class BasePassportPageSize {
     this.description_json,
     this.draft,
     this.drafted_at,
-    required this.pageSize,
+    required this.page_size,
     this.created_at,
     this.updated_at,
   });
@@ -29,7 +29,7 @@ class BasePassportPageSize {
   final Json? description_json;
   final bool? draft;
   final dynamic drafted_at;
-  final int pageSize;
+  final int page_size;
   final String? created_at;
   final String? updated_at;
 

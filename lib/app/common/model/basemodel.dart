@@ -22,30 +22,38 @@ class Basemodel {
 
   factory Basemodel.fromJson(Map<String, dynamic> json) {
     return Basemodel(
-      base_family_types: List.of(json["base_family_types"])
-          .map((i) => CommonModel.fromJson(i))
-          .toList(),
-      base_occupations: List.of(json["base_occupations"])
-          .map((i) => CommonModel.fromJson(i))
-          .toList(),
-      base_eye_colors: List.of(json["base_eye_colors"])
-          .map((i) => CommonModel.fromJson(i))
-          .toList(),
-      base_hair_colors: List.of(json["base_hair_colors"])
-          .map((i) => CommonModel.fromJson(i))
-          .toList(),
-      base_genders: List.of(json["base_genders"])
-          .map((i) => CommonModel.fromJson(i))
-          .toList(),
-      base_marital_statuses: List.of(json["base_marital_statuses"])
-          .map((i) => CommonModel.fromJson(i))
-          .toList(),
-      base_countries: List.of(json["base_countries"])
-          .map((i) => CommonModel.fromJson(i))
-          .toList(),
-      base_document_types: List.of(json["base_document_types"])
-          .map((i) => CommonModel.fromJson(i))
-          .toList(),
+      base_family_types:
+          List.of(
+            json["base_family_types"],
+          ).map((i) => CommonModel.fromJson(i)).toList(),
+      base_occupations:
+          List.of(
+            json["base_occupations"],
+          ).map((i) => CommonModel.fromJson(i)).toList(),
+      base_eye_colors:
+          List.of(
+            json["base_eye_colors"],
+          ).map((i) => CommonModel.fromJson(i)).toList(),
+      base_hair_colors:
+          List.of(
+            json["base_hair_colors"],
+          ).map((i) => CommonModel.fromJson(i)).toList(),
+      base_genders:
+          List.of(
+            json["base_genders"],
+          ).map((i) => CommonModel.fromJson(i)).toList(),
+      base_marital_statuses:
+          List.of(
+            json["base_marital_statuses"],
+          ).map((i) => CommonModel.fromJson(i)).toList(),
+      base_countries:
+          List.of(
+            json["base_countries"],
+          ).map((i) => CommonModel.fromJson(i)).toList(),
+      base_document_types:
+          List.of(
+            json["base_document_types"],
+          ).map((i) => CommonModel.fromJson(i)).toList(),
     );
   }
 }
@@ -55,17 +63,14 @@ class CommonModel {
   final String? id;
   final String name;
 
-  const CommonModel({
-    this.description,
-    required this.name,
-    this.id,
-  });
+  const CommonModel({this.description, required this.name, this.id});
 
   factory CommonModel.fromJson(Map<String, dynamic> json) {
     return CommonModel(
-        name: json['name'],
-        id: json['id'] ?? "",
-        description: json['description'] ?? "");
+      name: json['name'],
+      id: json['id'] ?? "",
+      description: json['description'] ?? "",
+    );
   }
 }
 
@@ -73,10 +78,7 @@ class AllowedContreyModel {
   final String id;
   final String name;
 
-  const AllowedContreyModel({
-    required this.id,
-    required this.name,
-  });
+  const AllowedContreyModel({required this.id, required this.name});
 
   factory AllowedContreyModel.fromJson(Map<String, dynamic> json) {
     return AllowedContreyModel(
@@ -101,10 +103,11 @@ class FamilyModel {
 
   factory FamilyModel.fromJson(Map<String, dynamic> json) {
     return FamilyModel(
-        family_type: CommonModel.fromJson(json['family_type']),
-        nationality_id: json['nationality_id'],
-        father_name: json['father_name'],
-        first_name: json['first_name']);
+      family_type: CommonModel.fromJson(json['family_type']),
+      nationality_id: json['nationality_id'],
+      father_name: json['father_name'],
+      first_name: json['first_name'],
+    );
   }
 
   Map<String, dynamic> toJson() {
@@ -115,4 +118,16 @@ class FamilyModel {
       'father_name': first_name,
     };
   }
+}
+
+class DocPathModel {
+  String? path;
+  String? docTypeId;
+
+  DocPathModel({this.path, this.docTypeId});
+
+  Map<String, dynamic> toJson() => {
+    "files": {"path": path},
+    "document_type_id": docTypeId,
+  };
 }

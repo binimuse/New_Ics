@@ -20,7 +20,7 @@ BasePassportPageSize _$BasePassportPageSizeFromJson(
           : Json.fromJson(json['description_json'] as Map<String, dynamic>),
       draft: json['draft'] as bool?,
       drafted_at: json['drafted_at'],
-      pageSize: (json['pageSize'] as num).toInt(),
+      page_size: (json['page_size'] as num).toInt(),
       created_at: json['created_at'] as String?,
       updated_at: json['updated_at'] as String?,
     );
@@ -35,7 +35,7 @@ Map<String, dynamic> _$BasePassportPageSizeToJson(
       'description_json': instance.description_json,
       'draft': instance.draft,
       'drafted_at': instance.drafted_at,
-      'pageSize': instance.pageSize,
+      'page_size': instance.page_size,
       'created_at': instance.created_at,
       'updated_at': instance.updated_at,
     };
