@@ -45,6 +45,7 @@ class SplashController extends GetxController {
   void checkIfSignedIn() async {
     final accessToken = await AuthUtil().getAccessToken();
     if (accessToken != null) {
+      print(accessToken);
       final isPhoneVerified = await AuthUtil().isUserPhoneVerified();
       if (isPhoneVerified) {
         Future.delayed(const Duration(seconds: 1), () {

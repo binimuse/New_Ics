@@ -148,6 +148,10 @@ class LoginController extends GetxController {
               "isFromForgot": false,
             },
           );
+        } else if (message == "Unauthorized") {
+          AppToasts.showError(message.toString());
+        } else {
+          AppToasts.showError(message.toString());
         }
       }
     }

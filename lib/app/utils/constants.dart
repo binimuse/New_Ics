@@ -31,6 +31,15 @@ class Constants {
   static const deactivateURl = "/auth/deactivate-account";
   static const changepassword = "/auth/change-password";
 
+  //passport
+  static const getPassportType = "/passport-type";
+  static const getPassportpagesize = "/passport-page-size";
+  static const getPassporturgencylevel = "/service-urgency-level";
+  static const getregion = "/region";
+  static const getpassportprice = "/passport-price";
+  static const getcountry = "/country";
+  static const getbranch = "/branch?country_id={country_id}";
+
   // static const baseUrl = "http://5.75.142.45:8015";
 
   // static const baseUrlFile =
