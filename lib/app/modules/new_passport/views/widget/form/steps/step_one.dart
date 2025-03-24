@@ -80,15 +80,18 @@ class Step1 extends StatelessWidget {
 
         SizedBox(height: 2.h),
         _buildBirthCountryDropdown(),
+        SizedBox(height: 2.h),
         _buildInputField(
           label: 'Birth place'.tr,
           controller: controller.birthplace,
           isMandatory: true,
+
           hint: 'Birth place'.tr,
           inputFormatters: [
             FilteringTextInputFormatter.allow(RegExp(r"[a-zA-Z0-9\s]")),
           ],
         ),
+        SizedBox(height: 2.h),
         _buildGenderDropdown(),
         _buildAdoptionCheckbox(),
       ],
@@ -140,9 +143,11 @@ class Step1 extends StatelessWidget {
         TextFormBuilder(
           isMandatory: isMandatory,
           controller: controller,
+
           validator:
               ValidationBuilder().required('$label is required'.tr).build(),
           hint: hint.tr,
+
           labelText: label.tr,
           inputFormatters: inputFormatters,
           showClearButton: false,
@@ -174,6 +179,8 @@ class Step1 extends StatelessWidget {
 
   Widget _buildDatePicker() {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Birth date'.tr,
@@ -199,7 +206,7 @@ class Step1 extends StatelessWidget {
   Widget _buildBirthCountryDropdown() {
     return _buildCountryDropdown(
       'Birth Country'.tr,
-      controller.bcountries,
+      controller.baseCountry,
       controller.birthCountryvalue.value,
       (value) {
         controller.birthCountryvalue.value = value;
@@ -269,6 +276,12 @@ class Step1 extends StatelessWidget {
       children: [
         FormBuilderDropdown(
           decoration: ReusableInputDecoration.getDecoration(label.tr),
+          // validator: (CommonModel? value) {
+          //   if (value == null) {
+          //     return 'Please select ${label}'.tr;
+          //   }
+          //   return null;
+          // },
           items:
               items.map((CommonModel value) {
                 return DropdownMenuItem<CommonModel>(
@@ -282,6 +295,7 @@ class Step1 extends StatelessWidget {
                 );
               }).toList(),
           onChanged: onChanged,
+
           name: label.tr,
           initialValue: initialValue,
         ),
@@ -334,7 +348,7 @@ class Step1 extends StatelessWidget {
                     CommonModel(name: "Ado", id: ""),
                   );
                 }
-             //   controller.mapBaseDataToLists();
+                //   controller.mapBaseDataToLists();
               },
             ),
             SizedBox(height: 2.h),

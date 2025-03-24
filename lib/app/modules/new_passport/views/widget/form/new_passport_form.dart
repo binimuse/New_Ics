@@ -232,7 +232,11 @@ class _StepperWithFormExampleState extends State<NewPassportForm> {
         return; // Add return here to prevent step increment
       }
     } else if (controller.currentStep.value == 2) {
-      // Add any specific validation for Step 3 if needed
+      if (controller.birthplace.text.isEmpty) {
+        _scrollToBottom();
+        AppToasts.showError("Birth place is required.".tr);
+        return; // Add return here to prevent step increment
+      }
       controller.currentStep.value++;
     } else if (controller.currentStep.value == 3) {
       checkdoc();

@@ -64,7 +64,7 @@ class NewPassportController extends GetxController {
   List<CommonModel> gender = [];
   List<CommonModel> occupations = [];
   List<CommonModel> familytype = [];
-  List<BaseCountry> bcountries = [];
+
   List<CommonModel> natinality = [];
   List<CommonModel> haircolor = [];
   List<CommonModel> eyecolor = [];
