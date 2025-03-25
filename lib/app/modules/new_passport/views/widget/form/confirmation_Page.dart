@@ -16,7 +16,7 @@ class ConfirmationPagePassport extends StatelessWidget {
   final VoidCallback onTap;
   final bool isFromFirstStep;
 
-  ConfirmationPagePassport({
+  const ConfirmationPagePassport({
     required this.context,
     required this.onTap,
     required this.controller,
@@ -179,9 +179,9 @@ class ConfirmationPagePassport extends StatelessWidget {
 
   String _formatPhoneNumber(String phoneNumber) {
     if (phoneNumber.startsWith('09')) {
-      return '${phoneNumber.substring(1)}';
+      return phoneNumber.substring(1);
     } else if (phoneNumber.startsWith('9')) {
-      return '$phoneNumber';
+      return phoneNumber;
     }
     return phoneNumber;
   }
@@ -271,7 +271,7 @@ class ConfirmationPagePassport extends StatelessWidget {
   }
 
   Widget _buildNetworkImage(Uri uri) {
-    return Container(
+    return SizedBox(
       width: 26.w,
       height: 15.h,
       child: ClipRRect(
@@ -288,7 +288,7 @@ class ConfirmationPagePassport extends StatelessWidget {
   }
 
   Widget _buildLocalImage(File file) {
-    return Container(
+    return SizedBox(
       width: 26.w,
       height: 15.h,
       child: ClipRRect(

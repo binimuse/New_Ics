@@ -1,8 +1,10 @@
 import 'dart:io';
-
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:get/get.dart';
+import 'package:get/get.dart' hide MultipartFile, FormData;
+import 'package:new_ics/app/common/app_toasts.dart';
+
 import 'package:new_ics/app/common/model/basemodel.dart';
 import 'package:new_ics/app/data/enums.dart';
 import 'package:new_ics/app/data/models/passport/base_country.dart';
@@ -19,6 +21,9 @@ import 'package:new_ics/app/utils/dio_util.dart';
 import 'package:new_ics/app/utils/validator_util.dart';
 
 import 'package:file_picker/file_picker.dart';
+
+import 'package:dio/dio.dart';
+import 'package:flutter/widgets.dart';
 
 class NewPassportController extends GetxController {
   Rx<NetworkStatus> networkStatus = Rx(NetworkStatus.IDLE);
@@ -446,9 +451,110 @@ class NewPassportController extends GetxController {
     basedocumentType.removeWhere((element) => element.id == pas.id);
   }
 
-  void sendPassportData() {}
+  void sendPassportData() async {
+    networkStatus.value = NetworkStatus.LOADING;
+    // File? file; // Use nullable File
+
+    try {
+      // MultipartFile? multipartFile;
+      // if (file != null) {
+      //   String fileExtension = file.path.split('.').last.toLowerCase();
+      //   String mimeType;
+      //   if (fileExtension == 'pdf') {
+      //     mimeType = 'application/pdf';
+      //   } else if (['jpeg', 'jpg', 'png'].contains(fileExtension)) {
+      //     mimeType = 'image/${fileExtension == 'jpg' ? 'jpeg' : fileExtension}';
+      //   } else {
+      //     throw Exception("Unsupported file type");
+      //   }
+
+      //   multipartFile = await MultipartFile.fromFile(
+      //     file.path,
+      //     contentType: MediaType.parse(mimeType),
+      //   );
+      // }
+
+      DateTime dateOfBirth = DateTime(
+        int.parse(yearController.text),
+        int.parse(monthController.text),
+        int.parse(dayController.text),
+      );
+      String formattedDateOfBirth = DateFormat(
+        'yyyy-MM-dd',
+      ).format(dateOfBirth);
+
+      FormData formData = FormData.fromMap({
+        'passport_price_id': basePassportPrice.first.id,
+        'passport_page_size_id': pagesizeValuevalue.value!.id,
+        'passport_type_id': selectedPassportType.value!.id,
+        'service_urgency_level_id': selectedUrgencyType.value!.id,
+        'application': {
+          'first_name': firstNameController.text,
+          'father_name': fatherNameController.text,
+          'grand_father_name': grandFatherNameController.text,
+          'first_name_json': firstnameToJson(),
+          'father_name_json': fathernameToJson(),
+          'grand_father_name_json': gfathernameToJson(),
+          'gender': gendervalue.value!.name,
+          'date_of_birth': formattedDateOfBirth,
+          'birth_place': birthplace.text,
+          'birth_country_id': birthCountryvalue.value!.id,
+          'is_adopted': isAdoption.value,
+          'marital_status': maritalstatusvalue.value!.name,
+          'height': height.text.isEmpty ? null : height.text,
+          'skin_color': skincolorvalue.value,
+          'eye_color': eyecolorvalue.value?.name ?? null,
+          'hair_color': haircolorvalue.value?.name ?? null,
+          'phone_number': countryCode.toString() + phonenumber.text,
+          'email': 'john.doe@example.com',
+          'photo': photoPath.first,
+          'branch_id': embassiesvalue.value!.id,
+          'occupation_id': occupationvalue.value?.id ?? null,
+          'living_country_id': currentcountryvalue.value!.id,
+          'living_address': addressController.text,
+          'house_number': houseNumberforDeleivery.text,
+          'current_country_id': currentcountryvalue.value!.id,
+
+          'service_urgency_level_id': selectedUrgencyType.value!.id,
+          'submitted': false,
+          'delivery_included': isDeliveryRequired.value,
+          'delivery_price': embassiesvalue.value?.delivery_price.toString(),
+        },
+      });
+
+      await PassportService(
+        DioUtil().getDio(useAccessToken: true),
+      ).sendPassport(formData: formData);
+
+      networkStatus.value = NetworkStatus.SUCCESS;
+
+      AppToasts.showSuccess("Complaint sent successfully".tr);
+
+      Get.back();
+    } catch (e) {
+      networkStatus.value = NetworkStatus.ERROR;
+
+      // It's good practice to handle specific exceptions if possible
+      ValidatorUtil.handleError(e);
+    }
+  }
 
   void deleteDoc(String? id) {}
+
+  Map<String, dynamic> firstnameToJson() {
+    return {"en": firstNameController.text, "am": AmfirstNameController.text};
+  }
+
+  Map<String, dynamic> gfathernameToJson() {
+    return {
+      "en": grandFatherNameController.text,
+      "am": AmgrandFatherNameController.text,
+    };
+  }
+
+  Map<String, dynamic> fathernameToJson() {
+    return {"en": fatherNameController.text, "am": AmfatherNameController.text};
+  }
 }
 
 class BaseInstruction {

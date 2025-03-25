@@ -46,4 +46,7 @@ abstract class PassportService {
 
   @GET(Constants.getdocumenttype)
   Future<List<BasedocumentType>> getdocumenttype(@Path("code") String code);
+
+  @POST(Constants.sendPassportData)
+  Future sendPassport({@Body() required FormData formData});
 }

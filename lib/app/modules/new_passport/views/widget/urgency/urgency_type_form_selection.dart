@@ -136,21 +136,21 @@ class UrgencyTypeSelection extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildPriceSummaryHeader(),
-                  SizedBox(height: 8),
+                  SizedBox(height: 2.h),
                   _buildPriceRow(
                     'Currency:',
                     controller.collactioncountry.value!.name == "Ethiopia"
                         ? "ETB"
                         : "USD",
                   ),
-                  SizedBox(height: 8),
+                  SizedBox(height: 2.h),
                   _buildPriceRow(
                     'Service Price:',
                     controller.displayedPrice.value,
                   ),
-                  SizedBox(height: 8),
+                  SizedBox(height: 2.h),
                   _buildDeliveryPriceRow(),
-                  SizedBox(height: 8),
+                  SizedBox(height: 2.h),
                   _buildDeliveryCheckboxSection(),
                   _buildTotalPriceRow(
                     'Total Price:',
