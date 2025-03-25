@@ -6,7 +6,9 @@ import 'package:get/get.dart';
 import 'package:new_ics/app/common/model/basemodel.dart';
 import 'package:new_ics/app/data/enums.dart';
 import 'package:new_ics/app/data/models/passport/base_country.dart';
+import 'package:new_ics/app/data/models/passport/base_document_type.dart';
 import 'package:new_ics/app/data/models/passport/base_embassiy.dart';
+import 'package:new_ics/app/data/models/passport/base_occupation.dart';
 import 'package:new_ics/app/data/models/passport/base_regions.dart';
 import 'package:new_ics/app/data/models/passport/passport_page_price.dart';
 import 'package:new_ics/app/data/models/passport/passport_page_size.dart';
@@ -58,17 +60,17 @@ class NewPassportController extends GetxController {
   List<String> SkinColor = ['Black', 'Brown', 'Blue', 'Other'];
   List<CommonModel> countries = [];
   List<CommonModel> base_regions = [];
-  List<CommonModel> base_document_types = [];
+
   // List<PassportDocuments> documents = [];
   List<CommonModel> martial = [];
-  List<CommonModel> gender = [];
+  List<BaseOccupation> gender = [];
   List<CommonModel> occupations = [];
-  List<CommonModel> familytype = [];
+  List<BaseCountry> familytype = [];
 
   List<CommonModel> natinality = [];
   List<CommonModel> haircolor = [];
   List<CommonModel> eyecolor = [];
-
+  late TextEditingController emailController;
   // List<DateTime> occupiedDates = [];
   // List<DocPathModel> docList = [];
   var countryCode = "+251";
@@ -77,11 +79,16 @@ class NewPassportController extends GetxController {
   Rxn<DateTime> selectedDateTime = Rxn<DateTime>();
   late TabController tabController;
   var displayedPrice = ''.obs;
+  var isEmailValid = false.obs;
+  final emailFocusNode = FocusNode();
   @override
   void onInit() {
+    emailController = TextEditingController();
     getPassportType();
     getBaseCountry();
     getPassportPageSize();
+    getoccupation();
+    getdocumnatType();
     super.onInit();
   }
 
@@ -95,6 +102,9 @@ class NewPassportController extends GetxController {
 
   RxList<BasePassportPageSize> basePassportPageSize =
       RxList<BasePassportPageSize>([]);
+
+  RxList<BaseOccupation> baseOccupation = RxList<BaseOccupation>([]);
+  RxList<BasedocumentType> basedocumentType = RxList<BasedocumentType>([]);
   Rxn<BasePassportPageSize> pagesizeValuevalue = Rxn<BasePassportPageSize>();
 
   RxList<BasePassportUrgencyType> basePassportUrgencyType =
@@ -112,6 +122,64 @@ class NewPassportController extends GetxController {
 
   RxList<BasePassportUrgencyType> filteredUrgencyTypes =
       List<BasePassportUrgencyType>.of([]).obs;
+  bool validateEmail() {
+    final email = emailController.text;
+    String pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
+    RegExp regex = RegExp(pattern);
+    if (regex.hasMatch(email)) {
+      isEmailValid(true);
+      return true;
+    } else {
+      isEmailValid(false);
+      return false;
+    }
+  }
+
+  void getdocumnatType() async {
+    networkStatus.value = NetworkStatus.LOADING;
+
+    try {
+      List<BasedocumentType> response = await PassportService(
+        DioUtil().getDio(useAccessToken: true),
+      ).getdocumenttype("Facere rem sed aliqu");
+      //ToDO: change this to  response.where((type) => type.draft == false).toList();
+      basedocumentType.value =
+          response.where((type) => type.draft != false).toList();
+
+      for (var documentType in basedocumentType) {
+        documents.add(
+          PassportDocuments(documentTypeId: documentType.id, files: []),
+        );
+      }
+      // print("sdfsf ${documents.length}");
+
+      networkStatus.value = NetworkStatus.SUCCESS;
+    } catch (e) {
+      print(e);
+      networkStatus.value = NetworkStatus.ERROR;
+      ValidatorUtil.handleError(e);
+    }
+  }
+
+  void getoccupation() async {
+    networkStatus.value = NetworkStatus.LOADING;
+
+    try {
+      List<BaseOccupation> response =
+          await PassportService(
+            DioUtil().getDio(useAccessToken: true),
+          ).getoccupation();
+      //ToDO: change this to  response.where((type) => type.draft == false).toList();
+      baseOccupation.value =
+          response.where((type) => type.draft != false).toList();
+
+      networkStatus.value = NetworkStatus.SUCCESS;
+    } catch (e) {
+      print(e);
+      networkStatus.value = NetworkStatus.ERROR;
+      ValidatorUtil.handleError(e);
+    }
+  }
 
   getEmbassies(String countryid) async {
     networkStatus.value = NetworkStatus.LOADING;
@@ -322,17 +390,19 @@ class NewPassportController extends GetxController {
   //Rxn<BookedDate> bookedDate = Rxn<BookedDate>();
   Rxn<BaseCountry> birthCountryvalue = Rxn<BaseCountry>();
   Rxn<CommonModel> natinalityvalue = Rxn<CommonModel>();
-  Rxn<CommonModel> familynatinalityvalue = Rxn<CommonModel>();
+  Rxn<BaseCountry> familynatinalityvalue = Rxn<BaseCountry>();
   Rxn<BaseEmbassies> embassiesvalue = Rxn<BaseEmbassies>();
   Rxn<CommonModel> eyecolorvalue = Rxn<CommonModel>();
   Rxn<CommonModel> haircolorvalue = Rxn<CommonModel>();
   Rxn<CommonModel> maritalstatusvalue = Rxn<CommonModel>();
-  Rxn<CommonModel> gendervalue = Rxn<CommonModel>();
+  Rxn<BaseOccupation> gendervalue = Rxn<BaseOccupation>();
+  Rxn<BaseOccupation> baseOccupationvalue = Rxn<BaseOccupation>();
   Rxn<CommonModel> occupationvalue = Rxn<CommonModel>();
-  Rxn<CommonModel> familytypevalue = Rxn<CommonModel>();
+  Rxn<BaseOccupation> familytypevalue = Rxn<BaseOccupation>();
 
   Rxn<CommonModel> regionsvalue = Rxn<CommonModel>();
   Rxn<BaseCountry> collactioncountry = Rxn<BaseCountry>();
+  Rxn<BaseCountry> currentcountryvalue = Rxn<BaseCountry>();
   // Rxn<BasePassportPageSize> pagesizeValuevalue = Rxn<BasePassportPageSize>();
   // Rxn<GetUrlModel> getUrlModel = Rxn<GetUrlModel>();
   RxString skincolorvalue = ''.obs;
@@ -367,13 +437,13 @@ class NewPassportController extends GetxController {
     'Please use the below Screenshot for Photograph Tips.'.tr,
   ];
   List<DocPathModel> docList = [];
-  void addtoDocumants(CommonModel pas) {
+  void addtoDocumants(BasedocumentType pas) {
     print(documents.length);
-    base_document_types.add(pas);
+    basedocumentType.add(pas);
   }
 
-  void removeFromDocumants(CommonModel pas) {
-    base_document_types.removeWhere((element) => element.id == pas.id);
+  void removeFromDocumants(BasedocumentType pas) {
+    basedocumentType.removeWhere((element) => element.id == pas.id);
   }
 
   void sendPassportData() {}

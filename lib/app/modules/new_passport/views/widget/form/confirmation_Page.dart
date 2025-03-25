@@ -314,10 +314,7 @@ class ConfirmationPagePassport extends StatelessWidget {
           "Birth date".tr,
           '${controller.dayController.text}/ ${controller.monthController.text}/${controller.yearController.text}',
         ),
-        _buildTextInfo(
-          "Nationality".tr,
-          controller.natinalityvalue.value!.name,
-        ),
+
         _buildTextInfo(
           "Birth Country".tr,
           controller.birthCountryvalue.value!.name,

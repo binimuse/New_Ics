@@ -87,48 +87,43 @@ class _TextInputLoginState extends State<TextInputSignup> {
           style: AppTextStyles.titleBold.copyWith(
             color: AppColors.blackLight,
             fontSize:
-                checkIsPassword() ? AppSizes.font_14 * 0.9 : AppSizes.font_16,
+                checkIsPassword() ? AppSizes.font_14 * 0.9 : AppSizes.font_12,
           ),
           obscureText: checkIsPassword() ? !isPasswordVisible : false,
           obscuringCharacter: '⬤',
           //obscuringCharacter: '\u2022', // Customize the obscuring character
           decoration: InputDecoration(
             contentPadding: EdgeInsets.only(
-              bottom: checkIsPassword()
-                  ? AppSizes.mp_v_1 * 1.2
-                  : AppSizes.mp_v_1 / 2,
+              bottom:
+                  checkIsPassword()
+                      ? AppSizes.mp_v_1 * 1.2
+                      : AppSizes.mp_v_1 / 2,
               top: AppSizes.mp_v_1 / 2,
             ),
             labelText: _isFocused ? widget.hint : null,
             hintText: _isFocused ? null : widget.hint,
-            hintStyle: AppTextStyles.captionBold
-                .copyWith(color: AppColors.grayLighter),
-            labelStyle:
-                AppTextStyles.captionBold.copyWith(color: AppColors.grayLight),
+            hintStyle: AppTextStyles.captionBold.copyWith(
+              color: AppColors.grayLighter,
+            ),
+            labelStyle: AppTextStyles.captionBold.copyWith(
+              color: AppColors.grayLight,
+            ),
             floatingLabelBehavior: FloatingLabelBehavior.auto,
             suffixIconConstraints: BoxConstraints(
               maxWidth: AppSizes.icon_size_10,
               maxHeight: AppSizes.icon_size_10,
             ),
             disabledBorder: UnderlineInputBorder(
-              borderSide: BorderSide(
-                color: AppColors.grayLight,
-              ),
+              borderSide: BorderSide(color: AppColors.grayLight),
             ),
             border: UnderlineInputBorder(
-              borderSide: BorderSide(
-                color: AppColors.grayLight,
-              ),
+              borderSide: BorderSide(color: AppColors.grayLight),
             ),
             enabledBorder: UnderlineInputBorder(
-              borderSide: BorderSide(
-                color: AppColors.grayLight,
-              ),
+              borderSide: BorderSide(color: AppColors.grayLight),
             ),
             focusedBorder: UnderlineInputBorder(
-              borderSide: BorderSide(
-                color: AppColors.black,
-              ),
+              borderSide: BorderSide(color: AppColors.black),
             ),
           ),
           onChanged: (value) {
@@ -153,23 +148,21 @@ class _TextInputLoginState extends State<TextInputSignup> {
         ),
         checkIsPassword()
             ? Align(
-                alignment: Alignment.centerRight,
-                child: Padding(
-                  padding: EdgeInsets.only(
-                    top: AppSizes.mp_v_1,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      checkHasMoreInstructions()
-                          ? buildMoreInstructions()
-                          : const SizedBox(),
-                      buildHideUnhideButton()
-                    ],
-                  ),
+              alignment: Alignment.centerRight,
+              child: Padding(
+                padding: EdgeInsets.only(top: AppSizes.mp_v_1),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    checkHasMoreInstructions()
+                        ? buildMoreInstructions()
+                        : const SizedBox(),
+                    buildHideUnhideButton(),
+                  ],
                 ),
-              )
+              ),
+            )
             : const SizedBox(),
       ],
     );
@@ -228,16 +221,15 @@ class _TextInputLoginState extends State<TextInputSignup> {
             child: SvgPicture.asset(
               isPasswordVisible
                   ? Assets.icons.eye
-                  : Assets.icons
+                  : Assets
+                      .icons
                       .eyeSlash, // Use different icons based on the password visibility
               color:
                   isPasswordVisible ? AppColors.primary : AppColors.grayLight,
               width: AppSizes.icon_size_6,
             ),
           ),
-          SizedBox(
-            width: AppSizes.mp_w_1,
-          ),
+          SizedBox(width: AppSizes.mp_w_1),
           Flexible(
             child: Text(
               isPasswordVisible

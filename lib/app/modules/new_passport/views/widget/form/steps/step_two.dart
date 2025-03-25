@@ -5,6 +5,7 @@ import 'package:new_ics/app/common/forms/reusableDropdown.dart';
 import 'package:new_ics/app/common/forms/text_input_with_builder.dart';
 import 'package:new_ics/app/common/model/basemodel.dart';
 import 'package:new_ics/app/common/photo_upload/photo_upload.dart';
+import 'package:new_ics/app/data/models/passport/base_occupation.dart';
 import 'package:new_ics/app/modules/new_passport/controllers/new_passport_controller.dart';
 import 'package:new_ics/app/theme/app_colors.dart';
 import 'package:new_ics/app/theme/app_sizes.dart';
@@ -34,22 +35,22 @@ class Step2 extends StatelessWidget {
         SizedBox(height: 2.h),
         _buildDropdownField(
           title: 'Occupation'.tr,
-          items: controller.occupations,
-          onChanged: (value) => controller.occupationvalue.value = value,
+          items: controller.baseOccupation,
+          onChanged: (value) => controller.baseOccupationvalue.value = value,
           initialValue: null,
         ),
         SizedBox(height: 2.h),
         _buildDropdownField(
           title: 'Hair Color'.tr,
-          items: controller.haircolor,
-          onChanged: (value) => controller.haircolorvalue.value = value!,
+          items: controller.baseOccupation,
+          onChanged: (value) => controller.baseOccupationvalue.value = value,
           initialValue: null,
         ),
         SizedBox(height: 2.h),
         _buildDropdownField(
           title: 'Eye Color'.tr,
-          items: controller.eyecolor,
-          onChanged: (value) => controller.eyecolorvalue.value = value!,
+          items: controller.baseOccupation,
+          onChanged: (value) => controller.baseOccupationvalue.value = value,
           initialValue: null,
         ),
         SizedBox(height: 2.h),
@@ -106,21 +107,21 @@ class Step2 extends StatelessWidget {
 
   Widget _buildDropdownField({
     required String title,
-    required List<CommonModel> items,
-    required Function(CommonModel?) onChanged,
-    CommonModel? initialValue,
+    required List<BaseOccupation> items,
+    required Function(BaseOccupation?) onChanged,
+    BaseOccupation? initialValue,
   }) {
     return Column(
       children: [
         SizedBox(height: 2.h),
-        FormBuilderDropdown<CommonModel>(
+        FormBuilderDropdown<BaseOccupation>(
           decoration: ReusableInputDecoration.getDecoration(
             title,
             isMandatory: false,
           ),
           items:
-              items.map((CommonModel value) {
-                return DropdownMenuItem<CommonModel>(
+              items.map((BaseOccupation value) {
+                return DropdownMenuItem<BaseOccupation>(
                   value: value,
                   child: Text(
                     value.name,
@@ -141,8 +142,8 @@ class Step2 extends StatelessWidget {
   Widget _buildMaritalStatusDropdown() {
     return _buildDropdownField(
       title: 'Marital Status'.tr,
-      items: controller.martial,
-      onChanged: (value) => controller.maritalstatusvalue.value = value!,
+      items: controller.baseOccupation,
+      onChanged: (value) => controller.baseOccupationvalue.value = value,
       initialValue: null,
     );
   }

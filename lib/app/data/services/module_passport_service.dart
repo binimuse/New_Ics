@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart' hide Headers;
 import 'package:new_ics/app/data/models/passport/base_country.dart';
+import 'package:new_ics/app/data/models/passport/base_document_type.dart';
 import 'package:new_ics/app/data/models/passport/base_embassiy.dart';
+import 'package:new_ics/app/data/models/passport/base_occupation.dart';
 import 'package:new_ics/app/data/models/passport/base_regions.dart';
 import 'package:new_ics/app/data/models/passport/passport_page_price.dart';
 import 'package:new_ics/app/data/models/passport/passport_page_size.dart';
@@ -38,4 +40,10 @@ abstract class PassportService {
 
   @GET(Constants.getbranch)
   Future<List<BaseEmbassies>> getembassy(@Path("country_id") String country_id);
+
+  @GET(Constants.getoccupation)
+  Future<List<BaseOccupation>> getoccupation();
+
+  @GET(Constants.getdocumenttype)
+  Future<List<BasedocumentType>> getdocumenttype(@Path("code") String code);
 }

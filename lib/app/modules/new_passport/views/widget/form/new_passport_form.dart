@@ -14,6 +14,7 @@ import 'package:new_ics/app/modules/new_passport/views/widget/form/confirmation_
 import 'package:new_ics/app/modules/new_passport/views/widget/form/steps/step_five.dart';
 import 'package:new_ics/app/modules/new_passport/views/widget/form/steps/step_four.dart';
 import 'package:new_ics/app/modules/new_passport/views/widget/form/steps/step_one.dart';
+import 'package:new_ics/app/modules/new_passport/views/widget/form/steps/step_six.dart';
 import 'package:new_ics/app/modules/new_passport/views/widget/form/steps/step_three.dart';
 import 'package:new_ics/app/modules/new_passport/views/widget/form/steps/step_two.dart';
 import 'package:new_ics/app/routes/app_pages.dart';
@@ -131,7 +132,8 @@ class _StepperWithFormExampleState extends State<NewPassportForm> {
         if (controller.currentStep.value == 1) Step2(controller: controller),
         if (controller.currentStep.value == 2) Step3(controller: controller),
         if (controller.currentStep.value == 3) Step4(controller: controller),
-        if (controller.currentStep.value == 5) Step5(),
+        if (controller.currentStep.value == 4) Step5(controller: controller),
+        if (controller.currentStep.value == 5) Step6(),
       ],
     );
   }
@@ -238,7 +240,7 @@ class _StepperWithFormExampleState extends State<NewPassportForm> {
         return; // Add return here to prevent step increment
       }
       controller.currentStep.value++;
-    } else if (controller.currentStep.value == 3) {
+    } else if (controller.currentStep.value == 4) {
       checkdoc();
     } else {
       controller.currentStep.value++;
@@ -252,7 +254,7 @@ class _StepperWithFormExampleState extends State<NewPassportForm> {
     } else {
       for (var document in controller.documents) {
         if (document.files.isEmpty) {
-          final documentType = controller.base_document_types.firstWhere(
+          final documentType = controller.basedocumentType.firstWhere(
             (type) => type.id == document.documentTypeId,
           );
           AppToasts.showError("${documentType.name} must not be empty".tr);

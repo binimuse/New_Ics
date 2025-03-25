@@ -7,6 +7,7 @@ import 'package:new_ics/app/common/fileupload/common_file_uploder.dart';
 import 'package:new_ics/app/common/fileupload/pdfpicker.dart';
 import 'package:new_ics/app/common/model/basemodel.dart';
 import 'package:new_ics/app/data/enums.dart';
+import 'package:new_ics/app/data/models/passport/base_document_type.dart';
 import 'package:new_ics/app/modules/new_passport/controllers/new_passport_controller.dart';
 import 'package:new_ics/app/theme/app_colors.dart';
 import 'package:new_ics/app/theme/app_text_styles.dart';
@@ -14,7 +15,7 @@ import 'package:new_ics/app/theme/app_text_styles.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 class BuildDoc extends StatefulWidget {
-  final CommonModel documentType;
+  final BasedocumentType documentType;
   final NewPassportController controller;
 
   const BuildDoc({required this.documentType, required this.controller});
@@ -61,56 +62,61 @@ class _BuildDocState extends State<BuildDoc> {
       onTap: () {
         openPdfPicker();
       },
-      child: hasError
-          ? Container() // Return an empty Container when there's an error
-          : Container(
-              padding: EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: AppColors.primaryLighter.withOpacity(0.3),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.file_copy,
-                    color: AppColors.primary,
-                  ),
-                  SizedBox(height: 1.h),
-                  Text(
-                    'Upload ${widget.documentType.name}',
-                    style: AppTextStyles.bodySmallBold.copyWith(
-                      color: AppColors.primary,
+      child:
+          hasError
+              ? Container() // Return an empty Container when there's an error
+              : Container(
+                padding: EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryLighter.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(Icons.file_copy, color: AppColors.primary),
+                    SizedBox(height: 1.h),
+                    Text(
+                      'Upload ${widget.documentType.name}',
+                      style: AppTextStyles.bodySmallBold.copyWith(
+                        color: AppColors.primary,
+                      ),
                     ),
-                  ),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.vertical,
-                    child: ListView.builder(
-                      physics: const NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
+                    SingleChildScrollView(
                       scrollDirection: Axis.vertical,
-                      itemCount: widget.controller.documents
-                          .firstWhere((element) =>
-                              element.documentTypeId == widget.documentType.id)
-                          .files
-                          .length,
-                      itemBuilder: (BuildContext context, int index) {
-                        final file = widget.controller.documents
-                            .firstWhere((element) =>
-                                element.documentTypeId ==
-                                widget.documentType.id)
-                            .files[index];
-                        return FileItem(
-                          file: file,
-                          onDelete: () => deleteFile(index),
-                        );
-                      },
+                      child: ListView.builder(
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        scrollDirection: Axis.vertical,
+                        itemCount:
+                            widget.controller.documents
+                                .firstWhere(
+                                  (element) =>
+                                      element.documentTypeId ==
+                                      widget.documentType.id,
+                                )
+                                .files
+                                .length,
+                        itemBuilder: (BuildContext context, int index) {
+                          final file =
+                              widget.controller.documents
+                                  .firstWhere(
+                                    (element) =>
+                                        element.documentTypeId ==
+                                        widget.documentType.id,
+                                  )
+                                  .files[index];
+                          return FileItem(
+                            file: file,
+                            onDelete: () => deleteFile(index),
+                          );
+                        },
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
     );
   }
 
@@ -128,10 +134,11 @@ class _BuildDocState extends State<BuildDoc> {
       setState(() {
         widget.controller.documents
             .where(
-                (element) => element.documentTypeId == widget.documentType.id)
+              (element) => element.documentTypeId == widget.documentType.id,
+            )
             .forEach((element) {
-          element.files.removeAt(index);
-        });
+              element.files.removeAt(index);
+            });
       });
     }
   }
@@ -143,23 +150,28 @@ class _BuildDocState extends State<BuildDoc> {
   Future<void> _handleFilePickedSuccess(PlatformFile pickedFile) async {
     widget.controller.documents
         .firstWhere(
-            (element) => element.documentTypeId == widget.documentType.id)
+          (element) => element.documentTypeId == widget.documentType.id,
+        )
         .files
         .clear(); // Clear the existing files
 
     widget.controller.documents
         .firstWhere(
-            (element) => element.documentTypeId == widget.documentType.id)
+          (element) => element.documentTypeId == widget.documentType.id,
+        )
         .files
         .add(pickedFile);
     MinioUploader uploader = MinioUploader();
-    String responseUrl =
-        await uploader.uploadFileToMinio(pickedFile, widget.documentType.id!);
+    String responseUrl = await uploader.uploadFileToMinio(
+      pickedFile,
+      widget.documentType.id!,
+    );
 
     if (responseUrl.isNotEmpty) {
       widget.controller.networkStatus.value = NetworkStatus.SUCCESS;
       widget.controller.docList.add(
-          DocPathModel(path: responseUrl, docTypeId: widget.documentType.id));
+        DocPathModel(path: responseUrl, docTypeId: widget.documentType.id),
+      );
 
       setState(() {});
     } else {
@@ -179,21 +191,13 @@ class FileItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Container(
-          height: 18.h,
-          child: PDFView(
-            filePath: file.path!,
-          ),
-        ),
+        Container(height: 18.h, child: PDFView(filePath: file.path!)),
         Positioned(
           top: 8.0,
           right: 8.0,
           child: GestureDetector(
             onTap: onDelete,
-            child: Icon(
-              Icons.delete,
-              color: Colors.red,
-            ),
+            child: Icon(Icons.delete, color: Colors.red),
           ),
         ),
       ],
@@ -205,10 +209,7 @@ class ConfirmDeleteDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(
-        "Confirm Delete".tr,
-        style: AppTextStyles.bodyLargeBold,
-      ),
+      title: Text("Confirm Delete".tr, style: AppTextStyles.bodyLargeBold),
       content: Text(
         "Are you sure you want to delete the file?".tr,
         textAlign: TextAlign.start,
@@ -217,8 +218,9 @@ class ConfirmDeleteDialog extends StatelessWidget {
       actions: <Widget>[
         GestureDetector(
           onTap: () {
-            Navigator.of(context)
-                .pop(false); // Return false if cancel is pressed
+            Navigator.of(
+              context,
+            ).pop(false); // Return false if cancel is pressed
           },
           child: Container(
             alignment: Alignment.center,
@@ -228,10 +230,7 @@ class ConfirmDeleteDialog extends StatelessWidget {
             width: 25.w,
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [
-                  AppColors.primary,
-                  AppColors.primary,
-                ],
+                colors: [AppColors.primary, AppColors.primary],
                 begin: Alignment.centerLeft,
                 end: Alignment.centerRight,
               ),
@@ -240,8 +239,9 @@ class ConfirmDeleteDialog extends StatelessWidget {
             child: Center(
               child: Text(
                 "Cancel".tr,
-                style: AppTextStyles.bodyLargeBold
-                    .copyWith(color: AppColors.whiteOff),
+                style: AppTextStyles.bodyLargeBold.copyWith(
+                  color: AppColors.whiteOff,
+                ),
               ),
             ),
           ),
@@ -258,10 +258,7 @@ class ConfirmDeleteDialog extends StatelessWidget {
             width: 25.w,
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [
-                  AppColors.danger,
-                  AppColors.danger,
-                ],
+                colors: [AppColors.danger, AppColors.danger],
                 begin: Alignment.centerLeft,
                 end: Alignment.centerRight,
               ),
@@ -270,8 +267,9 @@ class ConfirmDeleteDialog extends StatelessWidget {
             child: Center(
               child: Text(
                 "Delete".tr,
-                style: AppTextStyles.bodyLargeBold
-                    .copyWith(color: AppColors.whiteOff),
+                style: AppTextStyles.bodyLargeBold.copyWith(
+                  color: AppColors.whiteOff,
+                ),
               ),
             ),
           ),

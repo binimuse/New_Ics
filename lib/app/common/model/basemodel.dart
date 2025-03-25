@@ -1,3 +1,6 @@
+import 'package:new_ics/app/data/models/passport/base_country.dart';
+import 'package:new_ics/app/data/models/passport/base_occupation.dart';
+
 class Basemodel {
   final List<CommonModel> base_genders;
   final List<CommonModel> base_occupations;
@@ -89,7 +92,7 @@ class AllowedContreyModel {
 }
 
 class FamilyModel {
-  final CommonModel? family_type;
+  final BaseOccupation? family_type;
   final String? nationality_id;
   final String? first_name;
   final String? father_name;
@@ -103,7 +106,7 @@ class FamilyModel {
 
   factory FamilyModel.fromJson(Map<String, dynamic> json) {
     return FamilyModel(
-      family_type: CommonModel.fromJson(json['family_type']),
+      family_type: BaseOccupation.fromJson(json['family_type']),
       nationality_id: json['nationality_id'],
       father_name: json['father_name'],
       first_name: json['first_name'],

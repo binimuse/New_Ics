@@ -11,6 +11,9 @@ import 'package:new_ics/app/common/forms/reusableDropdown.dart';
 import 'package:new_ics/app/common/forms/text_input_with_builder.dart';
 import 'package:new_ics/app/common/model/basemodel.dart';
 import 'package:new_ics/app/data/models/passport/base_country.dart';
+import 'package:new_ics/app/data/models/passport/base_document_type.dart'
+    show BasedocumentType;
+import 'package:new_ics/app/data/models/passport/base_occupation.dart';
 import 'package:new_ics/app/modules/new_passport/controllers/new_passport_controller.dart';
 import 'package:new_ics/app/theme/app_colors.dart';
 import 'package:new_ics/app/theme/app_sizes.dart';
@@ -268,9 +271,9 @@ class Step1 extends StatelessWidget {
 
   Widget _buildDropdown({
     required String label,
-    required List<CommonModel> items,
-    required Function(CommonModel?) onChanged,
-    CommonModel? initialValue,
+    required List<BaseOccupation> items,
+    required Function(BaseOccupation?) onChanged,
+    BaseOccupation? initialValue,
   }) {
     return Column(
       children: [
@@ -283,13 +286,14 @@ class Step1 extends StatelessWidget {
           //   return null;
           // },
           items:
-              items.map((CommonModel value) {
-                return DropdownMenuItem<CommonModel>(
+              items.map((BaseOccupation value) {
+                return DropdownMenuItem<BaseOccupation>(
                   value: value,
                   child: Text(
                     value.name,
                     style: AppTextStyles.captionBold.copyWith(
                       color: AppColors.grayDark,
+                      fontSize: AppSizes.font_12,
                     ),
                   ),
                 );
@@ -307,9 +311,9 @@ class Step1 extends StatelessWidget {
   Widget _buildGenderDropdown() {
     return _buildDropdown(
       label: 'Gender'.tr,
-      items: controller.gender,
+      items: controller.baseOccupation,
       onChanged: (value) {
-        controller.gendervalue.value = value!;
+        controller.baseOccupationvalue.value = value!;
       },
       initialValue: null,
     );
@@ -342,11 +346,13 @@ class Step1 extends StatelessWidget {
               onChanged: (value) {
                 controller.isAdoption.value = value!;
                 if (controller.isAdoption.value) {
-                  controller.addtoDocumants(CommonModel(name: "Ado", id: ""));
+                  // controller.addtoDocumants(
+                  //   BasedocumentType(name: "Ado", id: ""),
+                  // );
                 } else {
-                  controller.removeFromDocumants(
-                    CommonModel(name: "Ado", id: ""),
-                  );
+                  // controller.removeFromDocumants(
+                  //   BasedocumentType(name: "Ado", id: ""),
+                  // );
                 }
                 //   controller.mapBaseDataToLists();
               },
