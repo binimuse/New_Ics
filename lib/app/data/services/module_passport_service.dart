@@ -6,6 +6,7 @@ import 'package:new_ics/app/data/models/passport/base_occupation.dart';
 import 'package:new_ics/app/data/models/passport/base_regions.dart';
 import 'package:new_ics/app/data/models/passport/passport_page_price.dart';
 import 'package:new_ics/app/data/models/passport/passport_page_size.dart';
+import 'package:new_ics/app/data/models/passport/passport_responce.dart';
 import 'package:new_ics/app/data/models/passport/passport_type.dart';
 import 'package:new_ics/app/data/models/passport/passport_urgency_type.dart';
 import 'package:new_ics/app/utils/constants.dart';
@@ -45,8 +46,10 @@ abstract class PassportService {
   Future<List<BaseOccupation>> getoccupation();
 
   @GET(Constants.getdocumenttype)
-  Future<List<BasedocumentType>> getdocumenttype(@Path("code") String code);
+  Future<List<BasedocumentCategoryType>> getdocumenttype(
+    @Path("code") String code,
+  );
 
   @POST(Constants.sendPassportData)
-  Future sendPassport({@Body() required FormData formData});
+  Future<PassportResponce> sendPassport({@Body() required FormData formData});
 }

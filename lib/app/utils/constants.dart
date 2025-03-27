@@ -4,6 +4,8 @@ class Constants {
   static const baseUrl = "http://5.75.142.45:4000";
   static const String fileUploader =
       'http://5.75.142.45:3002/direct-single-file-upload';
+
+  static const String fileViewer = 'http://5.75.142.45:9000/';
   //language
   static const String selectedLanguage = "SELECTED_LANGUAGE";
   static const String lanAm = "am";
@@ -42,8 +44,8 @@ class Constants {
   static const getcountry = "/country";
   static const getbranch = "/branch?country_id={country_id}";
   static const getoccupation = "/occupation";
-  static const getdocumenttype = "/document-type?code={code}";
-  static const sendPassportData = "/complaint";
+  static const getdocumenttype = "/document-category-type?code={code}";
+  static const sendPassportData = "/new-passport-application";
 
   // static const baseUrl = "http://5.75.142.45:8015";
 

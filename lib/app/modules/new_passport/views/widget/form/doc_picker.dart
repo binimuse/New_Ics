@@ -15,7 +15,7 @@ import 'package:new_ics/app/theme/app_text_styles.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 class BuildDoc extends StatefulWidget {
-  final BasedocumentType documentType;
+  final BasedocumentCategoryType documentType;
   final NewPassportController controller;
 
   const BuildDoc({required this.documentType, required this.controller});
@@ -48,6 +48,7 @@ class _BuildDocState extends State<BuildDoc> {
           print("Error in geturl: $s");
         }
       }
+      widget.controller.networkStatus.value = NetworkStatus.SUCCESS;
     } catch (e) {
       widget.controller.networkStatus.value = NetworkStatus.ERROR;
 
@@ -78,7 +79,7 @@ class _BuildDocState extends State<BuildDoc> {
                     Icon(Icons.file_copy, color: AppColors.primary),
                     SizedBox(height: 1.h),
                     Text(
-                      'Upload ${widget.documentType.name}',
+                      'Upload ${widget.documentType.description}',
                       style: AppTextStyles.bodySmallBold.copyWith(
                         color: AppColors.primary,
                       ),
@@ -129,16 +130,16 @@ class _BuildDocState extends State<BuildDoc> {
     );
 
     if (confirmDelete == true) {
-      widget.controller.deleteDoc(widget.documentType.id);
-
       setState(() {
-        widget.controller.documents
-            .where(
-              (element) => element.documentTypeId == widget.documentType.id,
-            )
-            .forEach((element) {
-              element.files.removeAt(index);
-            });
+        var documentEntry = widget.controller.documents.firstWhere(
+          (element) => element.documentTypeId == widget.documentType.id,
+        );
+        documentEntry.files.removeAt(index);
+
+        // If no files are left, remove the document entry
+        if (documentEntry.files.isEmpty) {
+          widget.controller.documents.remove(documentEntry);
+        }
       });
     }
   }
@@ -148,36 +149,26 @@ class _BuildDocState extends State<BuildDoc> {
   }
 
   Future<void> _handleFilePickedSuccess(PlatformFile pickedFile) async {
-    widget.controller.documents
-        .firstWhere(
-          (element) => element.documentTypeId == widget.documentType.id,
-        )
-        .files
-        .clear(); // Clear the existing files
-
-    widget.controller.documents
-        .firstWhere(
-          (element) => element.documentTypeId == widget.documentType.id,
-        )
-        .files
-        .add(pickedFile);
-    MinioUploader uploader = MinioUploader();
-    String responseUrl = await uploader.uploadFileToMinio(
-      pickedFile,
-      widget.documentType.id!,
+    // Find the document entry for the current document type
+    var documentEntry = widget.controller.documents.firstWhere(
+      (element) => element.documentTypeId == widget.documentType.id,
+      orElse:
+          () => PassportDocuments(
+            documentTypeId: widget.documentType.id,
+            files: [],
+          ),
     );
 
-    if (responseUrl.isNotEmpty) {
-      widget.controller.networkStatus.value = NetworkStatus.SUCCESS;
-      widget.controller.docList.add(
-        DocPathModel(path: responseUrl, docTypeId: widget.documentType.id),
-      );
-
-      setState(() {});
-    } else {
-      widget.controller.networkStatus.value = NetworkStatus.ERROR;
-      print('Response is false');
+    // If the document entry doesn't exist, add it
+    if (!widget.controller.documents.contains(documentEntry)) {
+      widget.controller.documents.add(documentEntry);
     }
+
+    // Add the picked file to the document entry
+    documentEntry.files.add(pickedFile);
+
+    // Update the UI
+    setState(() {});
   }
 }
 

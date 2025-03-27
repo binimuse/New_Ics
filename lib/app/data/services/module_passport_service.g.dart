@@ -258,20 +258,20 @@ class _PassportService implements PassportService {
   }
 
   @override
-  Future<List<BasedocumentType>> getdocumenttype(String code) async {
+  Future<List<BasedocumentCategoryType>> getdocumenttype(String code) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final Map<String, dynamic>? _data = null;
-    final _result = await _dio
-        .fetch<List<dynamic>>(_setStreamType<List<BasedocumentType>>(Options(
+    final _result = await _dio.fetch<List<dynamic>>(
+        _setStreamType<List<BasedocumentCategoryType>>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
     )
             .compose(
               _dio.options,
-              '/document-type?code=${code}',
+              '/document-category-type?code=${code}',
               queryParameters: queryParameters,
               data: _data,
             )
@@ -281,35 +281,36 @@ class _PassportService implements PassportService {
               baseUrl,
             ))));
     var value = _result.data!
-        .map(
-            (dynamic i) => BasedocumentType.fromJson(i as Map<String, dynamic>))
+        .map((dynamic i) =>
+            BasedocumentCategoryType.fromJson(i as Map<String, dynamic>))
         .toList();
     return value;
   }
 
   @override
-  Future<dynamic> sendPassport({required FormData formData}) async {
+  Future<PassportResponce> sendPassport({required FormData formData}) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final _data = formData;
-    final _result = await _dio.fetch(_setStreamType<dynamic>(Options(
+    final _result = await _dio
+        .fetch<Map<String, dynamic>>(_setStreamType<PassportResponce>(Options(
       method: 'POST',
       headers: _headers,
       extra: _extra,
     )
-        .compose(
-          _dio.options,
-          '/complaint',
-          queryParameters: queryParameters,
-          data: _data,
-        )
-        .copyWith(
-            baseUrl: _combineBaseUrls(
-          _dio.options.baseUrl,
-          baseUrl,
-        ))));
-    final value = _result.data;
+            .compose(
+              _dio.options,
+              '/new-passport-application',
+              queryParameters: queryParameters,
+              data: _data,
+            )
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
+    final value = PassportResponce.fromJson(_result.data!);
     return value;
   }
 

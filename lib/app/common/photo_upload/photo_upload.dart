@@ -1,14 +1,10 @@
 // ignore_for_file: must_be_immutable
 
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:image_picker/image_picker.dart';
-import 'package:new_ics/app/common/app_toasts.dart';
 import 'package:new_ics/app/common/dialogs/upload_dilaog.dart';
-import 'package:new_ics/app/common/fileupload/common_file_uploder.dart';
 import 'package:new_ics/app/common/loading/custom_loading_widget.dart';
 import 'package:new_ics/app/data/enums.dart';
 import 'package:new_ics/app/theme/app_assets.dart';
@@ -24,9 +20,10 @@ class PhotoUpload extends StatelessWidget {
     : super(key: key);
 
   final RxList<File> selectedImages;
-  RxList<String> photoPath;
+  final RxList<String> photoPath;
 
   Rx<NetworkStatus> networkStatus = Rx(NetworkStatus.IDLE);
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -105,7 +102,7 @@ class PhotoUpload extends StatelessWidget {
         child: GestureDetector(
           onTap: () {
             if (imageFile != null) {
-              // _showImageInPopup(imageFile);
+              // Show image in a popup or perform other actions
             } else {
               showUploadDialog(context);
             }
@@ -130,9 +127,7 @@ class PhotoUpload extends StatelessWidget {
                   right: 5,
                   child: GestureDetector(
                     onTap: () {
-                      print(imageFile);
                       selectedImages.removeAt(0);
-                      //imageFile.deleteSync();
                       photoPath.removeAt(0);
                     },
                     child: const Icon(Icons.delete, color: Colors.red),
@@ -209,24 +204,9 @@ class PhotoUpload extends StatelessWidget {
     final XFile? image = await picker.pickImage(source: ImageSource.camera);
 
     if (image != null) {
-      final PlatformFile pickedFile = PlatformFile(
-        path: image.path,
-        name: image.name,
-        size: 0,
-        bytes: null,
-      );
-
-      final int maxSizeInBytes = 30 * 1024 * 1024; // 10 MB
-
-      try {
-        if (pickedFile.size <= maxSizeInBytes) {
-          handleFilePickedSuccess(pickedFile);
-        } else {
-          AppToasts.showError("Invalid File, Please select an Image.");
-        }
-      } catch (e) {
-        print("Error: $e");
-      }
+      final File file = File(image.path);
+      selectedImages.add(file);
+      photoPath.add(image.path);
     }
   }
 
@@ -235,93 +215,20 @@ class PhotoUpload extends StatelessWidget {
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
 
     if (image != null) {
-      final PlatformFile pickedFile = PlatformFile(
-        path: image.path,
-        name: image.name,
-        size: 0,
-        bytes: null,
-      );
-
-      final int maxSizeInBytes = 30 * 1024 * 1024; // 10 MB
-
-      try {
-        if (pickedFile.size <= maxSizeInBytes) {
-          handleFilePickedSuccess(pickedFile);
-        } else {
-          AppToasts.showError("Invalid File, Please select an Image.");
-        }
-      } catch (e) {
-        print("Error: $e");
-      }
+      final File file = File(image.path);
+      selectedImages.add(file);
+      photoPath.add(image.path);
     }
   }
 
-  Widget showImage(dynamic path) {
-    Widget imageWidget;
-
-    if (path is File) {
-      // Determine if the path is a local file or network URL
-      Uri? uri;
-      try {
-        uri = Uri.parse(path.path);
-      } catch (e) {
-        uri = null;
-      }
-
-      if (uri != null && uri.isAbsolute) {
-        // Selected image is from a network URL
-        imageWidget = Container(
-          width: 26.w,
-          height: 15.h,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(8.0),
-            child: CachedNetworkImage(
-              imageUrl: uri.toString(),
-              fit: BoxFit.cover,
-              placeholder:
-                  (context, url) => Center(child: CircularProgressIndicator()),
-              errorWidget: (context, url, error) => Icon(Icons.error),
-            ),
-          ),
-        );
-      } else {
-        // Selected image is from a local file
-        imageWidget = Container(
-          width: 26.w,
-          height: 15.h,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(8.0),
-            child: Image.file(path, fit: BoxFit.cover),
-          ),
-        );
-      }
-    } else {
-      // Invalid image path or URL
-      imageWidget = Container(); // or any other placeholder widget
-    }
-
-    return imageWidget;
-  }
-
-  handleFilePickedSuccess(PlatformFile pickedFile) async {
-    networkStatus.value = NetworkStatus.LOADING;
-    print("bini ${pickedFile}");
-    // Perform the async operations
-
-    MinioUploader uploader = MinioUploader();
-    String responseUrl = await uploader.uploadFileToMinio(pickedFile, "");
-
-    if (responseUrl.isNotEmpty) {
-      selectedImages.add(File(pickedFile.path!));
-      photoPath.clear();
-      photoPath.add(responseUrl);
-      networkStatus.value = NetworkStatus.SUCCESS;
-      // Response is successful
-    } else {
-      networkStatus.value = NetworkStatus.ERROR;
-
-      // Response is not successful
-      print('Response is false');
-    }
+  Widget showImage(File file) {
+    return Container(
+      width: 26.w,
+      height: 15.h,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8.0),
+        child: Image.file(file, fit: BoxFit.cover),
+      ),
+    );
   }
 }

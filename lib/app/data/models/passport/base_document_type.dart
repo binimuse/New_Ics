@@ -5,43 +5,31 @@ import 'package:json_annotation/json_annotation.dart';
 part 'base_document_type.g.dart';
 
 @JsonSerializable()
-class BasedocumentType {
-  const BasedocumentType({
+class BasedocumentCategoryType {
+  const BasedocumentCategoryType({
     required this.id,
-    required this.name,
-    required this.code,
-    required this.size,
-    required this.min_document_count,
-    required this.max_document_count,
+
     required this.description,
-    required this.name_json,
-    required this.description_json,
-    required this.allowed_file_types,
-    required this.check_hint,
-    required this.expires,
+    required this.document_category_id,
+    required this.document_type_id,
+    required this.is_required,
     required this.draft,
     required this.created_at,
   });
 
-  factory BasedocumentType.fromJson(Map<String, dynamic> json) =>
-      _$BasedocumentTypeFromJson(json);
+  factory BasedocumentCategoryType.fromJson(Map<String, dynamic> json) =>
+      _$BasedocumentCategoryTypeFromJson(json);
 
   final String id;
-  final String name;
-  final String code;
-  final int size;
-  final int min_document_count;
-  final int max_document_count;
+
   final String description;
-  final Json name_json;
-  final Json description_json;
-  final AllowedFileTypes allowed_file_types;
-  final String check_hint;
-  final bool expires;
+  final String document_category_id;
+  final String document_type_id;
+  final bool is_required;
   final bool draft;
   final String created_at;
 
-  Map<String, dynamic> toJson() => _$BasedocumentTypeToJson(this);
+  Map<String, dynamic> toJson() => _$BasedocumentCategoryTypeToJson(this);
 }
 
 @JsonSerializable()

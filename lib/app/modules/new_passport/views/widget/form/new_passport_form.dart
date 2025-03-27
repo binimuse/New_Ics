@@ -257,7 +257,9 @@ class _StepperWithFormExampleState extends State<NewPassportForm> {
           final documentType = controller.basedocumentType.firstWhere(
             (type) => type.id == document.documentTypeId,
           );
-          AppToasts.showError("${documentType.name} must not be empty".tr);
+          AppToasts.showError(
+            "${documentType.description} must not be empty".tr,
+          );
 
           return;
         }

@@ -114,7 +114,7 @@ class Step5 extends StatelessWidget {
             shrinkWrap: true,
             itemCount: controller.basedocumentType.length,
             itemBuilder: (BuildContext context, int index) {
-              BasedocumentType documentType =
+              BasedocumentCategoryType documentType =
                   controller.basedocumentType[index];
               return BuildDoc(
                 documentType: documentType,

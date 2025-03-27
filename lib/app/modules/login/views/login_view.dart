@@ -444,7 +444,7 @@ class LoginView extends GetView<LoginController> {
             buttonText = "Log in".tr;
             buttonColors = AppColors.primary;
           } else {
-            buttonText = "Enter Pin".tr;
+            buttonText = "Enter Password".tr;
             buttonColors = AppColors.grayLight;
           }
         } else {

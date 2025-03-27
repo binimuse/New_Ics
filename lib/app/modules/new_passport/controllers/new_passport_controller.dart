@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:get/get.dart' hide MultipartFile, FormData;
 import 'package:new_ics/app/common/app_toasts.dart';
-
+import 'package:http_parser/http_parser.dart';
 import 'package:new_ics/app/common/model/basemodel.dart';
 import 'package:new_ics/app/data/enums.dart';
 import 'package:new_ics/app/data/models/passport/base_country.dart';
@@ -17,6 +17,7 @@ import 'package:new_ics/app/data/models/passport/passport_page_size.dart';
 import 'package:new_ics/app/data/models/passport/passport_type.dart';
 import 'package:new_ics/app/data/models/passport/passport_urgency_type.dart';
 import 'package:new_ics/app/data/services/module_passport_service.dart';
+import 'package:new_ics/app/routes/app_pages.dart';
 import 'package:new_ics/app/utils/dio_util.dart';
 import 'package:new_ics/app/utils/validator_util.dart';
 
@@ -102,6 +103,7 @@ class NewPassportController extends GetxController {
   RxList<PassportTypeResponse> passportTypeResponse =
       RxList<PassportTypeResponse>([]);
   void setPassportType(PassportTypeResponse passportType) {
+    print("Passport type selected: ${passportType.id}");
     selectedPassportType.value = passportType;
   }
 
@@ -109,7 +111,8 @@ class NewPassportController extends GetxController {
       RxList<BasePassportPageSize>([]);
 
   RxList<BaseOccupation> baseOccupation = RxList<BaseOccupation>([]);
-  RxList<BasedocumentType> basedocumentType = RxList<BasedocumentType>([]);
+  RxList<BasedocumentCategoryType> basedocumentType =
+      RxList<BasedocumentCategoryType>([]);
   Rxn<BasePassportPageSize> pagesizeValuevalue = Rxn<BasePassportPageSize>();
 
   RxList<BasePassportUrgencyType> basePassportUrgencyType =
@@ -144,12 +147,12 @@ class NewPassportController extends GetxController {
     networkStatus.value = NetworkStatus.LOADING;
 
     try {
-      List<BasedocumentType> response = await PassportService(
+      List<BasedocumentCategoryType> response = await PassportService(
         DioUtil().getDio(useAccessToken: true),
       ).getdocumenttype("Facere rem sed aliqu");
-      //ToDO: change this to  response.where((type) => type.draft == false).toList();
+
       basedocumentType.value =
-          response.where((type) => type.draft != false).toList();
+          response.where((type) => type.draft == false).toList();
 
       for (var documentType in basedocumentType) {
         documents.add(
@@ -442,38 +445,21 @@ class NewPassportController extends GetxController {
     'Please use the below Screenshot for Photograph Tips.'.tr,
   ];
   List<DocPathModel> docList = [];
-  void addtoDocumants(BasedocumentType pas) {
+  void addtoDocumants(BasedocumentCategoryType pas) {
     print(documents.length);
     basedocumentType.add(pas);
   }
 
-  void removeFromDocumants(BasedocumentType pas) {
+  void removeFromDocumants(BasedocumentCategoryType pas) {
     basedocumentType.removeWhere((element) => element.id == pas.id);
   }
 
+  RxList<PlatformFile> selectedFile = <PlatformFile>[].obs;
   void sendPassportData() async {
     networkStatus.value = NetworkStatus.LOADING;
-    // File? file; // Use nullable File
 
     try {
-      // MultipartFile? multipartFile;
-      // if (file != null) {
-      //   String fileExtension = file.path.split('.').last.toLowerCase();
-      //   String mimeType;
-      //   if (fileExtension == 'pdf') {
-      //     mimeType = 'application/pdf';
-      //   } else if (['jpeg', 'jpg', 'png'].contains(fileExtension)) {
-      //     mimeType = 'image/${fileExtension == 'jpg' ? 'jpeg' : fileExtension}';
-      //   } else {
-      //     throw Exception("Unsupported file type");
-      //   }
-
-      //   multipartFile = await MultipartFile.fromFile(
-      //     file.path,
-      //     contentType: MediaType.parse(mimeType),
-      //   );
-      // }
-
+      // Format the date of birth
       DateTime dateOfBirth = DateTime(
         int.parse(yearController.text),
         int.parse(monthController.text),
@@ -483,6 +469,7 @@ class NewPassportController extends GetxController {
         'yyyy-MM-dd',
       ).format(dateOfBirth);
 
+      // Prepare the form data
       FormData formData = FormData.fromMap({
         'passport_price_id': basePassportPrice.first.id,
         'passport_page_size_id': pagesizeValuevalue.value!.id,
@@ -495,18 +482,18 @@ class NewPassportController extends GetxController {
           'first_name_json': firstnameToJson(),
           'father_name_json': fathernameToJson(),
           'grand_father_name_json': gfathernameToJson(),
-          'gender': gendervalue.value!.name,
+          'gender': "Male",
           'date_of_birth': formattedDateOfBirth,
           'birth_place': birthplace.text,
           'birth_country_id': birthCountryvalue.value!.id,
           'is_adopted': isAdoption.value,
-          'marital_status': maritalstatusvalue.value!.name,
+          'marital_status': "",
           'height': height.text.isEmpty ? null : height.text,
           'skin_color': skincolorvalue.value,
           'eye_color': eyecolorvalue.value?.name ?? null,
           'hair_color': haircolorvalue.value?.name ?? null,
           'phone_number': countryCode.toString() + phonenumber.text,
-          'email': 'john.doe@example.com',
+          'email': emailController.text,
           'photo': photoPath.first,
           'branch_id': embassiesvalue.value!.id,
           'occupation_id': occupationvalue.value?.id ?? null,
@@ -514,7 +501,6 @@ class NewPassportController extends GetxController {
           'living_address': addressController.text,
           'house_number': houseNumberforDeleivery.text,
           'current_country_id': currentcountryvalue.value!.id,
-
           'service_urgency_level_id': selectedUrgencyType.value!.id,
           'submitted': false,
           'delivery_included': isDeliveryRequired.value,
@@ -522,19 +508,76 @@ class NewPassportController extends GetxController {
         },
       });
 
-      await PassportService(
+      // Send the passport data
+      final response = await PassportService(
         DioUtil().getDio(useAccessToken: true),
       ).sendPassport(formData: formData);
 
-      networkStatus.value = NetworkStatus.SUCCESS;
-
-      AppToasts.showSuccess("Complaint sent successfully".tr);
-
-      Get.back();
-    } catch (e) {
+      // Check if the response is successful
+      if (response != null && response.id != null) {
+        AppToasts.showSuccess("Passport data submitted successfully.".tr);
+        sendDocuments(response.id); // Call sendDocuments only if successful
+      } else {
+        throw Exception("Failed to submit passport data.");
+      }
+    } catch (e, s) {
+      print(e);
+      print(s);
       networkStatus.value = NetworkStatus.ERROR;
 
-      // It's good practice to handle specific exceptions if possible
+      // Handle the error
+      ValidatorUtil.handleError(e);
+    }
+  }
+
+  void sendDocuments(String newPassportApplicationId) async {
+    if (documents.isEmpty) {
+      print("No documents to send.");
+      return;
+    }
+
+    networkStatus.value = NetworkStatus.LOADING;
+
+    try {
+      for (var document in documents) {
+        for (var file in document.files) {
+          File localFile = File(file.path!);
+
+          String fileExtension = localFile.path.split('.').last.toLowerCase();
+          String mimeType;
+          if (fileExtension == 'pdf') {
+            mimeType = 'application/pdf';
+          } else if (['jpeg', 'jpg', 'png'].contains(fileExtension)) {
+            mimeType =
+                'image/${fileExtension == 'jpg' ? 'jpeg' : fileExtension}';
+          } else {
+            throw Exception("Unsupported file type");
+          }
+
+          MultipartFile multipartFile = await MultipartFile.fromFile(
+            localFile.path,
+            contentType: MediaType.parse(mimeType),
+          );
+
+          FormData formData = FormData.fromMap({
+            'new_passport_application_id': newPassportApplicationId,
+            'document_category_type_id': document.documentTypeId,
+            'file': multipartFile,
+          });
+
+          await PassportService(
+            DioUtil().getDio(useAccessToken: true),
+          ).sendPassport(formData: formData);
+
+          print("Document sent successfully: ${file.name}");
+        }
+      }
+
+      networkStatus.value = NetworkStatus.SUCCESS;
+      AppToasts.showSuccess("All documents sent successfully.".tr);
+      Get.offNamedUntil(Routes.MAIN_PAGE, (route) => true);
+    } catch (e) {
+      networkStatus.value = NetworkStatus.ERROR;
       ValidatorUtil.handleError(e);
     }
   }
