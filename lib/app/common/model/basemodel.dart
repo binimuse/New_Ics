@@ -1,4 +1,3 @@
-import 'package:new_ics/app/data/models/passport/base_country.dart';
 import 'package:new_ics/app/data/models/passport/base_occupation.dart';
 
 class Basemodel {

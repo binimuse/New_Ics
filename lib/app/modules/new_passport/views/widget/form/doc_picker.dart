@@ -15,10 +15,13 @@ import 'package:new_ics/app/theme/app_text_styles.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 class BuildDoc extends StatefulWidget {
-  final BasedocumentCategoryType documentType;
+  final BasedocumentCategoryType basedocumentCategoryType;
   final NewPassportController controller;
 
-  const BuildDoc({required this.documentType, required this.controller});
+  const BuildDoc({
+    required this.basedocumentCategoryType,
+    required this.controller,
+  });
 
   @override
   _BuildDocState createState() => _BuildDocState();
@@ -79,7 +82,7 @@ class _BuildDocState extends State<BuildDoc> {
                     Icon(Icons.file_copy, color: AppColors.primary),
                     SizedBox(height: 1.h),
                     Text(
-                      'Upload ${widget.documentType.description}',
+                      'Upload ${widget.basedocumentCategoryType.documentType.name}',
                       style: AppTextStyles.bodySmallBold.copyWith(
                         color: AppColors.primary,
                       ),
@@ -95,7 +98,7 @@ class _BuildDocState extends State<BuildDoc> {
                                 .firstWhere(
                                   (element) =>
                                       element.documentTypeId ==
-                                      widget.documentType.id,
+                                      widget.basedocumentCategoryType.id,
                                 )
                                 .files
                                 .length,
@@ -105,7 +108,7 @@ class _BuildDocState extends State<BuildDoc> {
                                   .firstWhere(
                                     (element) =>
                                         element.documentTypeId ==
-                                        widget.documentType.id,
+                                        widget.basedocumentCategoryType.id,
                                   )
                                   .files[index];
                           return FileItem(
@@ -132,7 +135,8 @@ class _BuildDocState extends State<BuildDoc> {
     if (confirmDelete == true) {
       setState(() {
         var documentEntry = widget.controller.documents.firstWhere(
-          (element) => element.documentTypeId == widget.documentType.id,
+          (element) =>
+              element.documentTypeId == widget.basedocumentCategoryType.id,
         );
         documentEntry.files.removeAt(index);
 
@@ -151,10 +155,10 @@ class _BuildDocState extends State<BuildDoc> {
   Future<void> _handleFilePickedSuccess(PlatformFile pickedFile) async {
     // Find the document entry for the current document type
     var documentEntry = widget.controller.documents.firstWhere(
-      (element) => element.documentTypeId == widget.documentType.id,
+      (element) => element.documentTypeId == widget.basedocumentCategoryType.id,
       orElse:
           () => PassportDocuments(
-            documentTypeId: widget.documentType.id,
+            documentTypeId: widget.basedocumentCategoryType.id,
             files: [],
           ),
     );

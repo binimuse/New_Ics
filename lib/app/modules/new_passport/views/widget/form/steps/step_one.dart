@@ -95,7 +95,25 @@ class Step1 extends StatelessWidget {
           ],
         ),
         SizedBox(height: 2.h),
-        _buildGenderDropdown(),
+        FormBuilderDropdown(
+          decoration: ReusableInputDecoration.getDecoration(
+            'Gender'.tr,
+            isMandatory: false,
+          ),
+          items:
+              Gender.values.map((Gender color) {
+                return DropdownMenuItem<Gender>(
+                  value: color,
+                  child: Text(color.name),
+                );
+              }).toList(),
+          onChanged: (newValue) {
+            controller.selectedGender.value = newValue;
+          },
+          name: 'Gender'.tr,
+          initialValue: null,
+        ),
+        SizedBox(height: 2.h),
         _buildAdoptionCheckbox(),
       ],
     );
@@ -269,60 +287,12 @@ class Step1 extends StatelessWidget {
     }
   }
 
-  Widget _buildDropdown({
-    required String label,
-    required List<BaseOccupation> items,
-    required Function(BaseOccupation?) onChanged,
-    BaseOccupation? initialValue,
-  }) {
-    return Column(
-      children: [
-        FormBuilderDropdown(
-          decoration: ReusableInputDecoration.getDecoration(label.tr),
-          // validator: (CommonModel? value) {
-          //   if (value == null) {
-          //     return 'Please select ${label}'.tr;
-          //   }
-          //   return null;
-          // },
-          items:
-              items.map((BaseOccupation value) {
-                return DropdownMenuItem<BaseOccupation>(
-                  value: value,
-                  child: Text(
-                    value.name,
-                    style: AppTextStyles.captionBold.copyWith(
-                      color: AppColors.grayDark,
-                      fontSize: AppSizes.font_12,
-                    ),
-                  ),
-                );
-              }).toList(),
-          onChanged: onChanged,
-
-          name: label.tr,
-          initialValue: initialValue,
-        ),
-        SizedBox(height: 2.h),
-      ],
-    );
-  }
-
-  Widget _buildGenderDropdown() {
-    return _buildDropdown(
-      label: 'Gender'.tr,
-      items: controller.baseOccupation,
-      onChanged: (value) {
-        controller.baseOccupationvalue.value = value!;
-      },
-      initialValue: null,
-    );
-  }
-
   Widget _buildAdoptionCheckbox() {
     return Obx(() {
       if (controller.showAdoption.value) {
         return Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'Is Adoption ?'.tr,

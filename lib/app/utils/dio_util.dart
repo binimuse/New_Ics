@@ -82,7 +82,7 @@ class DioUtil {
     } catch (e) {
       // Log out the user and navigate to the login page if an error occurs
       await AuthUtil().logOut();
-      Get.offAllNamed(Routes.LOGIN);
+      Get.offAllNamed(Routes.ON_BORDING);
       return null;
     }
   }

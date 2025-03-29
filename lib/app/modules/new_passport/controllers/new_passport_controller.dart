@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +15,7 @@ import 'package:new_ics/app/data/models/passport/base_occupation.dart';
 import 'package:new_ics/app/data/models/passport/base_regions.dart';
 import 'package:new_ics/app/data/models/passport/passport_page_price.dart';
 import 'package:new_ics/app/data/models/passport/passport_page_size.dart';
+import 'package:new_ics/app/data/models/passport/passport_responce.dart';
 import 'package:new_ics/app/data/models/passport/passport_type.dart';
 import 'package:new_ics/app/data/models/passport/passport_urgency_type.dart';
 import 'package:new_ics/app/data/services/module_passport_service.dart';
@@ -24,7 +26,6 @@ import 'package:new_ics/app/utils/validator_util.dart';
 import 'package:file_picker/file_picker.dart';
 
 import 'package:dio/dio.dart';
-import 'package:flutter/widgets.dart';
 
 class NewPassportController extends GetxController {
   Rx<NetworkStatus> networkStatus = Rx(NetworkStatus.IDLE);
@@ -63,19 +64,15 @@ class NewPassportController extends GetxController {
   // Focus Nodes
   final phoneFocusNode = FocusNode();
   // Variables
-  List<String> SkinColor = ['Black', 'Brown', 'Blue', 'Other'];
+
   List<CommonModel> countries = [];
   List<CommonModel> base_regions = [];
 
   // List<PassportDocuments> documents = [];
-  List<CommonModel> martial = [];
-  List<BaseOccupation> gender = [];
+
   List<CommonModel> occupations = [];
   List<BaseCountry> familytype = [];
 
-  List<CommonModel> natinality = [];
-  List<CommonModel> haircolor = [];
-  List<CommonModel> eyecolor = [];
   late TextEditingController emailController;
   // List<DateTime> occupiedDates = [];
   // List<DocPathModel> docList = [];
@@ -111,7 +108,7 @@ class NewPassportController extends GetxController {
       RxList<BasePassportPageSize>([]);
 
   RxList<BaseOccupation> baseOccupation = RxList<BaseOccupation>([]);
-  RxList<BasedocumentCategoryType> basedocumentType =
+  RxList<BasedocumentCategoryType> basedocumentCategoryType =
       RxList<BasedocumentCategoryType>([]);
   Rxn<BasePassportPageSize> pagesizeValuevalue = Rxn<BasePassportPageSize>();
 
@@ -130,6 +127,60 @@ class NewPassportController extends GetxController {
 
   RxList<BasePassportUrgencyType> filteredUrgencyTypes =
       List<BasePassportUrgencyType>.of([]).obs;
+
+  Rxn<Basemodel> baseData = Rxn<Basemodel>();
+  //Rxn<BookedDate> bookedDate = Rxn<BookedDate>();
+  Rxn<BaseCountry> birthCountryvalue = Rxn<BaseCountry>();
+  Rxn<CommonModel> natinalityvalue = Rxn<CommonModel>();
+  Rxn<BaseCountry> familynatinalityvalue = Rxn<BaseCountry>();
+  Rxn<BaseEmbassies> embassiesvalue = Rxn<BaseEmbassies>();
+
+  Rxn<Gender> selectedGender = Rxn<Gender>();
+  Rxn<MaritalStatus> selectedMaritalStatus = Rxn<MaritalStatus>();
+  Rxn<SkinColor> selectedSkinColor = Rxn<SkinColor>();
+  Rxn<EyeColor> selectedEyeColor = Rxn<EyeColor>();
+  Rxn<HairColor> selectedHairColor = Rxn<HairColor>();
+  Rxn<BaseOccupation> baseOccupationvalue = Rxn<BaseOccupation>();
+
+  Rxn<BaseOccupation> familytypevalue = Rxn<BaseOccupation>();
+
+  Rxn<CommonModel> regionsvalue = Rxn<CommonModel>();
+  Rxn<BaseCountry> collactioncountry = Rxn<BaseCountry>();
+  Rxn<BaseCountry> currentcountryvalue = Rxn<BaseCountry>();
+  // Rxn<BasePassportPageSize> pagesizeValuevalue = Rxn<BasePassportPageSize>();
+  // Rxn<GetUrlModel> getUrlModel = Rxn<GetUrlModel>();
+
+  RxBool isPhoneValid = false.obs;
+  RxBool isfeched = false.obs;
+  RxBool isAdoption = false.obs;
+  RxBool showAdoption = false.obs;
+  RxBool isSend = false.obs;
+  RxBool isSendDocSuccess = false.obs;
+  RxBool isUpdateSuccess = false.obs;
+  RxBool isDeleteDocSuccess = false.obs;
+  RxBool isfechediCitizens = false.obs;
+  RxBool isfechedEmbassies = false.obs;
+  RxBool isfechedregions = false.obs;
+  RxBool setFetchedStatus = false.obs;
+  RxBool isDeliveryRequired = false.obs;
+
+  //form
+  RxInt currentStep = 0.obs;
+  RxList<File> selectedImages = <File>[].obs;
+  List<PassportDocuments> documents = [];
+  RxList<FamilyModel> familyModelvalue = RxList<FamilyModel>();
+  RxList<String> photoPath = <String>[].obs;
+  List<String> contentTexts = [
+    'Size of the image/document should be less than 2MB.'.tr,
+    'Photo and Passport Copy should be only in Image file type of JPEG, JPG, PNG format.'
+        .tr,
+    'Allowed Images/documents file type extensions are JPEG, JPG, PNG and PDF format only.'
+        .tr,
+    'An image/document with blurred or unclean background is not acceptable.'
+        .tr,
+    'Please use the below Screenshot for Photograph Tips.'.tr,
+  ];
+  List<DocPathModel> docList = [];
   bool validateEmail() {
     final email = emailController.text;
     String pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
@@ -149,12 +200,12 @@ class NewPassportController extends GetxController {
     try {
       List<BasedocumentCategoryType> response = await PassportService(
         DioUtil().getDio(useAccessToken: true),
-      ).getdocumenttype("Facere rem sed aliqu");
+      ).getdocumenttype("NEW_PASSPORT");
 
-      basedocumentType.value =
+      basedocumentCategoryType.value =
           response.where((type) => type.draft == false).toList();
 
-      for (var documentType in basedocumentType) {
+      for (var documentType in basedocumentCategoryType) {
         documents.add(
           PassportDocuments(documentTypeId: documentType.id, files: []),
         );
@@ -162,8 +213,9 @@ class NewPassportController extends GetxController {
       // print("sdfsf ${documents.length}");
 
       networkStatus.value = NetworkStatus.SUCCESS;
-    } catch (e) {
+    } catch (e, s) {
       print(e);
+      print(s);
       networkStatus.value = NetworkStatus.ERROR;
       ValidatorUtil.handleError(e);
     }
@@ -182,8 +234,9 @@ class NewPassportController extends GetxController {
           response.where((type) => type.draft != false).toList();
 
       networkStatus.value = NetworkStatus.SUCCESS;
-    } catch (e) {
+    } catch (e, s) {
       print(e);
+      print(s);
       networkStatus.value = NetworkStatus.ERROR;
       ValidatorUtil.handleError(e);
     }
@@ -202,9 +255,10 @@ class NewPassportController extends GetxController {
 
       networkStatus.value = NetworkStatus.SUCCESS;
       isfechedEmbassies.value = true;
-    } catch (e) {
-      isfechedEmbassies.value = false;
+    } catch (e, s) {
       print(e);
+      print(s);
+      isfechedEmbassies.value = false;
       networkStatus.value = NetworkStatus.ERROR;
       ValidatorUtil.handleError(e);
     }
@@ -223,8 +277,9 @@ class NewPassportController extends GetxController {
           response.where((type) => type.draft == false).toList();
 
       networkStatus.value = NetworkStatus.SUCCESS;
-    } catch (e) {
+    } catch (e, s) {
       print(e);
+      print(s);
       networkStatus.value = NetworkStatus.ERROR;
       ValidatorUtil.handleError(e);
     }
@@ -245,8 +300,9 @@ class NewPassportController extends GetxController {
       filterUrgencyTypes();
 
       networkStatus.value = NetworkStatus.SUCCESS;
-    } catch (e) {
+    } catch (e, s) {
       print(e);
+      print(s);
       networkStatus.value = NetworkStatus.ERROR;
       ValidatorUtil.handleError(e);
     }
@@ -266,8 +322,9 @@ class NewPassportController extends GetxController {
 
       networkStatus.value = NetworkStatus.SUCCESS;
       updateDisplayedPrice();
-    } catch (e) {
+    } catch (e, s) {
       print(e);
+      print(s);
       networkStatus.value = NetworkStatus.ERROR;
       ValidatorUtil.handleError(e);
     }
@@ -280,25 +337,6 @@ class NewPassportController extends GetxController {
       displayedPrice.value = basePassportPrice.first.price_usd.toString();
     }
   }
-
-  // void getRegion(String country_id) async {
-  //   networkStatus.value = NetworkStatus.LOADING;
-
-  //   try {
-  //     List<BaseRegionResponce> response = await PassportService(
-  //       DioUtil().getDio(useAccessToken: true),
-  //     ).getregions(country_id);
-
-  //     baseRegionResponce.value =
-  //         response.where((type) => type.draft == false).toList();
-
-  //     networkStatus.value = NetworkStatus.SUCCESS;
-  //   } catch (e) {
-  //     print(e);
-  //     networkStatus.value = NetworkStatus.ERROR;
-  //     ValidatorUtil.handleError(e);
-  //   }
-  // }
 
   void setUrgencyType(BasePassportUrgencyType urgencyType) {
     selectedUrgencyType.value = urgencyType;
@@ -335,8 +373,9 @@ class NewPassportController extends GetxController {
           response.where((type) => type.draft != false).toList();
 
       networkStatus.value = NetworkStatus.SUCCESS;
-    } catch (e) {
+    } catch (e, s) {
       print(e);
+      print(s);
       networkStatus.value = NetworkStatus.ERROR;
       ValidatorUtil.handleError(e);
     }
@@ -355,8 +394,9 @@ class NewPassportController extends GetxController {
           response.where((type) => type.draft == false).toList();
 
       networkStatus.value = NetworkStatus.SUCCESS;
-    } catch (e) {
+    } catch (e, s) {
       print(e);
+      print(s);
       networkStatus.value = NetworkStatus.ERROR;
       ValidatorUtil.handleError(e);
     }
@@ -390,68 +430,13 @@ class NewPassportController extends GetxController {
     return termsChecked.every((element) => element);
   }
 
-  //urgency
-  // Rxn<BaseServiceUrgencyLevel> selectedUrgencyType =
-  //     Rxn<BaseServiceUrgencyLevel>(); // Initially null
-
-  Rxn<Basemodel> baseData = Rxn<Basemodel>();
-  //Rxn<BookedDate> bookedDate = Rxn<BookedDate>();
-  Rxn<BaseCountry> birthCountryvalue = Rxn<BaseCountry>();
-  Rxn<CommonModel> natinalityvalue = Rxn<CommonModel>();
-  Rxn<BaseCountry> familynatinalityvalue = Rxn<BaseCountry>();
-  Rxn<BaseEmbassies> embassiesvalue = Rxn<BaseEmbassies>();
-  Rxn<CommonModel> eyecolorvalue = Rxn<CommonModel>();
-  Rxn<CommonModel> haircolorvalue = Rxn<CommonModel>();
-  Rxn<CommonModel> maritalstatusvalue = Rxn<CommonModel>();
-  Rxn<BaseOccupation> gendervalue = Rxn<BaseOccupation>();
-  Rxn<BaseOccupation> baseOccupationvalue = Rxn<BaseOccupation>();
-  Rxn<CommonModel> occupationvalue = Rxn<CommonModel>();
-  Rxn<BaseOccupation> familytypevalue = Rxn<BaseOccupation>();
-
-  Rxn<CommonModel> regionsvalue = Rxn<CommonModel>();
-  Rxn<BaseCountry> collactioncountry = Rxn<BaseCountry>();
-  Rxn<BaseCountry> currentcountryvalue = Rxn<BaseCountry>();
-  // Rxn<BasePassportPageSize> pagesizeValuevalue = Rxn<BasePassportPageSize>();
-  // Rxn<GetUrlModel> getUrlModel = Rxn<GetUrlModel>();
-  RxString skincolorvalue = ''.obs;
-  RxBool isPhoneValid = false.obs;
-  RxBool isfeched = false.obs;
-  RxBool isAdoption = false.obs;
-  RxBool showAdoption = false.obs;
-  RxBool isSend = false.obs;
-  RxBool isSendDocSuccess = false.obs;
-  RxBool isUpdateSuccess = false.obs;
-  RxBool isDeleteDocSuccess = false.obs;
-  RxBool isfechediCitizens = false.obs;
-  RxBool isfechedEmbassies = false.obs;
-  RxBool isfechedregions = false.obs;
-  RxBool setFetchedStatus = false.obs;
-  RxBool isDeliveryRequired = false.obs;
-
-  //form
-  RxInt currentStep = 0.obs;
-  RxList<File> selectedImages = <File>[].obs;
-  List<PassportDocuments> documents = [];
-  RxList<FamilyModel> familyModelvalue = RxList<FamilyModel>();
-  RxList<String> photoPath = <String>[].obs;
-  List<String> contentTexts = [
-    'Size of the image/document should be less than 2MB.'.tr,
-    'Photo and Passport Copy should be only in Image file type of JPEG, JPG, PNG format.'
-        .tr,
-    'Allowed Images/documents file type extensions are JPEG, JPG, PNG and PDF format only.'
-        .tr,
-    'An image/document with blurred or unclean background is not acceptable.'
-        .tr,
-    'Please use the below Screenshot for Photograph Tips.'.tr,
-  ];
-  List<DocPathModel> docList = [];
   void addtoDocumants(BasedocumentCategoryType pas) {
     print(documents.length);
-    basedocumentType.add(pas);
+    basedocumentCategoryType.add(pas);
   }
 
   void removeFromDocumants(BasedocumentCategoryType pas) {
-    basedocumentType.removeWhere((element) => element.id == pas.id);
+    basedocumentCategoryType.removeWhere((element) => element.id == pas.id);
   }
 
   RxList<PlatformFile> selectedFile = <PlatformFile>[].obs;
@@ -459,75 +444,70 @@ class NewPassportController extends GetxController {
     networkStatus.value = NetworkStatus.LOADING;
 
     try {
-      // Format the date of birth
-      DateTime dateOfBirth = DateTime(
-        int.parse(yearController.text),
-        int.parse(monthController.text),
-        int.parse(dayController.text),
-      );
-      String formattedDateOfBirth = DateFormat(
-        'yyyy-MM-dd',
-      ).format(dateOfBirth);
+      // Prepare the payload
+      Map<String, dynamic> payload = _preparePassportPayload();
 
-      // Prepare the form data
-      FormData formData = FormData.fromMap({
-        'passport_price_id': basePassportPrice.first.id,
-        'passport_page_size_id': pagesizeValuevalue.value!.id,
-        'passport_type_id': selectedPassportType.value!.id,
-        'service_urgency_level_id': selectedUrgencyType.value!.id,
-        'application': {
-          'first_name': firstNameController.text,
-          'father_name': fatherNameController.text,
-          'grand_father_name': grandFatherNameController.text,
-          'first_name_json': firstnameToJson(),
-          'father_name_json': fathernameToJson(),
-          'grand_father_name_json': gfathernameToJson(),
-          'gender': "Male",
-          'date_of_birth': formattedDateOfBirth,
-          'birth_place': birthplace.text,
-          'birth_country_id': birthCountryvalue.value!.id,
-          'is_adopted': isAdoption.value,
-          'marital_status': "",
-          'height': height.text.isEmpty ? null : height.text,
-          'skin_color': skincolorvalue.value,
-          'eye_color': eyecolorvalue.value?.name ?? null,
-          'hair_color': haircolorvalue.value?.name ?? null,
-          'phone_number': countryCode.toString() + phonenumber.text,
-          'email': emailController.text,
-          'photo': photoPath.first,
-          'branch_id': embassiesvalue.value!.id,
-          'occupation_id': occupationvalue.value?.id ?? null,
-          'living_country_id': currentcountryvalue.value!.id,
-          'living_address': addressController.text,
-          'house_number': houseNumberforDeleivery.text,
-          'current_country_id': currentcountryvalue.value!.id,
-          'service_urgency_level_id': selectedUrgencyType.value!.id,
-          'submitted': false,
-          'delivery_included': isDeliveryRequired.value,
-          'delivery_price': embassiesvalue.value?.delivery_price.toString(),
-        },
-      });
+      log("Payload: $payload");
 
       // Send the passport data
-      final response = await PassportService(
+      final PassportResponce response = await PassportService(
         DioUtil().getDio(useAccessToken: true),
-      ).sendPassport(formData: formData);
+      ).sendPassport(payload);
 
-      // Check if the response is successful
-      if (response != null && response.id != null) {
-        AppToasts.showSuccess("Passport data submitted successfully.".tr);
-        sendDocuments(response.id); // Call sendDocuments only if successful
-      } else {
-        throw Exception("Failed to submit passport data.");
-      }
+      // Handle successful response
+
+      sendDocuments(response.data.id);
     } catch (e, s) {
-      print(e);
-      print(s);
-      networkStatus.value = NetworkStatus.ERROR;
-
-      // Handle the error
-      ValidatorUtil.handleError(e);
+      _handleError(e, s);
     }
+  }
+
+  Map<String, dynamic> _preparePassportPayload() {
+    // Format the date of birth
+    DateTime dateOfBirth = DateTime(
+      int.parse(yearController.text),
+      int.parse(monthController.text),
+      int.parse(dayController.text),
+    );
+    String formattedDateOfBirth = DateFormat(
+      "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+    ).format(dateOfBirth);
+
+    // Format the validation schedule date
+    DateTime parsedDate = DateTime.parse(selectedDateTime.value.toString());
+    String formattedselectedDateTime = DateFormat(
+      "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+    ).format(parsedDate.toUtc());
+
+    // Return the payload
+    return {
+      "first_name": firstNameController.text.trim(),
+      "father_name": fatherNameController.text.trim(),
+      "grand_father_name": grandFatherNameController.text.trim(),
+      "first_name_json": firstnameToJson(),
+      "father_name_json": fathernameToJson(),
+      "grand_father_name_json": gfathernameToJson(),
+      "date_of_birth": formattedDateOfBirth,
+      "birth_place": birthplace.text.trim(),
+      "birth_country_id": birthCountryvalue.value?.id ?? "",
+      "marital_status": selectedMaritalStatus.value?.name ?? "",
+      "hair_color": selectedHairColor.value?.name ?? "",
+      "gender": selectedGender.value?.name ?? "",
+      "skin_color": selectedSkinColor.value?.name ?? "",
+      "eye_color": selectedEyeColor.value?.name ?? "",
+      "height": height.text.isEmpty ? null : height.text.trim(),
+      "occupation_id": baseOccupationvalue.value?.id ?? "",
+      "living_address": addressController.text.trim(),
+      "living_country_id": currentcountryvalue.value?.id ?? "",
+      "current_country_id": currentcountryvalue.value?.id ?? "",
+      "phone_number": countryCode + phonenumber.text.trim(),
+      "branch_id": embassiesvalue.value?.id ?? "",
+      "service_urgency_level_id": selectedUrgencyType.value?.id ?? "",
+      "passport_page_size_id": pagesizeValuevalue.value?.id ?? "",
+      "passport_type_id": selectedPassportType.value?.id ?? "",
+      "passport_price_id": basePassportPrice.first.id,
+      "validation_schedule_date": formattedselectedDateTime,
+    };
   }
 
   void sendDocuments(String newPassportApplicationId) async {
@@ -541,48 +521,103 @@ class NewPassportController extends GetxController {
     try {
       for (var document in documents) {
         for (var file in document.files) {
-          File localFile = File(file.path!);
-
-          String fileExtension = localFile.path.split('.').last.toLowerCase();
-          String mimeType;
-          if (fileExtension == 'pdf') {
-            mimeType = 'application/pdf';
-          } else if (['jpeg', 'jpg', 'png'].contains(fileExtension)) {
-            mimeType =
-                'image/${fileExtension == 'jpg' ? 'jpeg' : fileExtension}';
-          } else {
-            throw Exception("Unsupported file type");
-          }
-
-          MultipartFile multipartFile = await MultipartFile.fromFile(
-            localFile.path,
-            contentType: MediaType.parse(mimeType),
+          await _uploadDocument(
+            newPassportApplicationId,
+            document.documentTypeId,
+            file,
           );
-
-          FormData formData = FormData.fromMap({
-            'new_passport_application_id': newPassportApplicationId,
-            'document_category_type_id': document.documentTypeId,
-            'file': multipartFile,
-          });
-
-          await PassportService(
-            DioUtil().getDio(useAccessToken: true),
-          ).sendPassport(formData: formData);
-
-          print("Document sent successfully: ${file.name}");
         }
       }
 
-      networkStatus.value = NetworkStatus.SUCCESS;
-      AppToasts.showSuccess("All documents sent successfully.".tr);
-      Get.offNamedUntil(Routes.MAIN_PAGE, (route) => true);
-    } catch (e) {
-      networkStatus.value = NetworkStatus.ERROR;
-      ValidatorUtil.handleError(e);
+      makeSubmitetdTrue(newPassportApplicationId);
+    } catch (e, s) {
+      _handleError(e, s);
     }
   }
 
-  void deleteDoc(String? id) {}
+  Future<void> _uploadDocument(
+    String applicationId,
+    String documentTypeId,
+    PlatformFile file,
+  ) async {
+    File localFile = File(file.path!);
+
+    String fileExtension = localFile.path.split('.').last.toLowerCase();
+    String mimeType = _getMimeType(fileExtension);
+
+    MultipartFile multipartFile = await MultipartFile.fromFile(
+      localFile.path,
+      contentType: MediaType.parse(mimeType),
+    );
+
+    FormData formData = FormData.fromMap({
+      'new_passport_application_id': applicationId,
+      'document_category_type_id': documentTypeId,
+      'file': multipartFile,
+    });
+
+    await PassportService(
+      DioUtil().getDio(useAccessToken: true),
+    ).sendPassportDoc(formData: formData);
+
+    print("Document sent successfully: ${file.name}");
+  }
+
+  String _getMimeType(String fileExtension) {
+    if (fileExtension == 'pdf') {
+      return 'application/pdf';
+    } else if (['jpeg', 'jpg', 'png'].contains(fileExtension)) {
+      return 'image/${fileExtension == 'jpg' ? 'jpeg' : fileExtension}';
+    } else {
+      throw Exception("Unsupported file type");
+    }
+  }
+
+  void makeSubmitetdTrue(String newPassportApplicationId) async {
+    networkStatus.value = NetworkStatus.LOADING;
+
+    try {
+      await PassportService(
+        DioUtil().getDio(useAccessToken: true),
+      ).makeSubmitTrue(newPassportApplicationId);
+
+      networkStatus.value = NetworkStatus.SUCCESS;
+      AppToasts.showSuccess("Passport data submitted successfully.".tr);
+      Get.offNamedUntil(Routes.MAIN_PAGE, (route) => true);
+    } catch (e, s) {
+      _handleError(e, s);
+    }
+  }
+
+  void _handleError(dynamic e, StackTrace s) {
+    print(e);
+    print(s);
+    networkStatus.value = NetworkStatus.ERROR;
+    ValidatorUtil.handleError(e);
+  }
+  // Future<String> uploadPhoto(String filePath) async {
+  //   try {
+  //     File file = File(filePath);
+  //     String fileName = file.path.split('/').last;
+
+  //     FormData formData = FormData.fromMap({
+  //       'file': await MultipartFile.fromFile(file.path, filename: fileName),
+  //     });
+
+  //     final response = await PassportService(
+  //       DioUtil().getDio(useAccessToken: true),
+  //     ).uploadPhoto(formData: formData);
+
+  //     if (response != null && response['url'] != null) {
+  //       return response['url']; // Return the uploaded photo URL
+  //     } else {
+  //       throw Exception("Failed to upload photo.");
+  //     }
+  //   } catch (e) {
+  //     print("Photo upload error: $e");
+  //     throw Exception("Photo upload failed.");
+  //   }
+  // }
 
   Map<String, dynamic> firstnameToJson() {
     return {"en": firstNameController.text, "am": AmfirstNameController.text};
@@ -613,3 +648,13 @@ class PassportDocuments {
 
   const PassportDocuments({required this.documentTypeId, required this.files});
 }
+
+enum Gender { MALE, FEMALE }
+
+enum MaritalStatus { SINGLE, MARRIED, DIVORCED, WIDOWED }
+
+enum SkinColor { FAIR, LIGHT, MEDIUM, DARK }
+
+enum EyeColor { BLACK, BROWN, BLUE, GREEN, HAZEL }
+
+enum HairColor { BLACK, BROWN, BLONDE, RED, GRAY, WHITE }

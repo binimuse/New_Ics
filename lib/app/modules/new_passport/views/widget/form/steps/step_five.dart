@@ -107,17 +107,17 @@ class Step5 extends StatelessWidget {
           ],
         ),
         SizedBox(height: 1.h),
-        Container(
+        SizedBox(
           height: 100.h,
           child: ListView.separated(
             physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
-            itemCount: controller.basedocumentType.length,
+            itemCount: controller.basedocumentCategoryType.length,
             itemBuilder: (BuildContext context, int index) {
-              BasedocumentCategoryType documentType =
-                  controller.basedocumentType[index];
+              BasedocumentCategoryType basedocumentCategoryType =
+                  controller.basedocumentCategoryType[index];
               return BuildDoc(
-                documentType: documentType,
+                basedocumentCategoryType: basedocumentCategoryType,
                 controller: controller,
               );
             },

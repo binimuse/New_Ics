@@ -320,27 +320,33 @@ class ConfirmationPagePassport extends StatelessWidget {
           controller.birthCountryvalue.value!.name,
         ),
         _buildTextInfo("Birth place".tr, controller.birthplace.text),
-        _buildTextInfo("Gender".tr, controller.gendervalue.value?.name ?? ""),
+        _buildTextInfo(
+          "Gender".tr,
+          controller.selectedGender.value?.name ?? "",
+        ),
         _buildTextInfo(
           "Adoption ?".tr,
           controller.isAdoption.value == true ? 'yes' : 'no',
         ),
         _buildTextInfo(
           "Occupation".tr,
-          controller.occupationvalue.value?.name ?? "",
+          controller.baseOccupationvalue.value?.name ?? "",
         ),
         _buildTextInfo(
           "Hair color".tr,
-          controller.haircolorvalue.value?.name ?? "",
+          controller.selectedHairColor.value?.name ?? "",
         ),
         _buildTextInfo(
           "eye color".tr,
-          controller.eyecolorvalue.value?.name ?? "",
+          controller.selectedEyeColor.value?.name ?? "",
         ),
-        _buildTextInfo("Skin color".tr, controller.skincolorvalue.value),
+        _buildTextInfo(
+          "Skin color".tr,
+          controller.selectedEyeColor.value!.name,
+        ),
         _buildTextInfo(
           "Marital Status".tr,
-          controller.maritalstatusvalue.value?.name ?? "",
+          controller.selectedMaritalStatus.value?.name ?? "",
         ),
         _buildTextInfo("height".tr, controller.height.text),
       ],

@@ -271,7 +271,7 @@ class _PassportService implements PassportService {
     )
             .compose(
               _dio.options,
-              '/document-category-type?code=${code}',
+              '/document-category-type?document_category_code=${code}',
               queryParameters: queryParameters,
               data: _data,
             )
@@ -288,11 +288,12 @@ class _PassportService implements PassportService {
   }
 
   @override
-  Future<PassportResponce> sendPassport({required FormData formData}) async {
+  Future<PassportResponce> sendPassport(Map<String, dynamic> payload) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final _data = formData;
+    final _data = <String, dynamic>{};
+    _data.addAll(payload);
     final _result = await _dio
         .fetch<Map<String, dynamic>>(_setStreamType<PassportResponce>(Options(
       method: 'POST',
@@ -311,6 +312,58 @@ class _PassportService implements PassportService {
               baseUrl,
             ))));
     final value = PassportResponce.fromJson(_result.data!);
+    return value;
+  }
+
+  @override
+  Future<dynamic> sendPassportDoc({required FormData formData}) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = formData;
+    final _result = await _dio.fetch(_setStreamType<dynamic>(Options(
+      method: 'POST',
+      headers: _headers,
+      extra: _extra,
+    )
+        .compose(
+          _dio.options,
+          '/new-passport-application-document',
+          queryParameters: queryParameters,
+          data: _data,
+        )
+        .copyWith(
+            baseUrl: _combineBaseUrls(
+          _dio.options.baseUrl,
+          baseUrl,
+        ))));
+    final value = _result.data;
+    return value;
+  }
+
+  @override
+  Future<dynamic> makeSubmitTrue(String id) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final Map<String, dynamic>? _data = null;
+    final _result = await _dio.fetch(_setStreamType<dynamic>(Options(
+      method: 'POST',
+      headers: _headers,
+      extra: _extra,
+    )
+        .compose(
+          _dio.options,
+          '/new-passport-application/${id}/submit',
+          queryParameters: queryParameters,
+          data: _data,
+        )
+        .copyWith(
+            baseUrl: _combineBaseUrls(
+          _dio.options.baseUrl,
+          baseUrl,
+        ))));
+    final value = _result.data;
     return value;
   }
 

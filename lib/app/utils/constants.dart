@@ -44,8 +44,11 @@ class Constants {
   static const getcountry = "/country";
   static const getbranch = "/branch?country_id={country_id}";
   static const getoccupation = "/occupation";
-  static const getdocumenttype = "/document-category-type?code={code}";
+  static const getdocumenttype =
+      "/document-category-type?document_category_code={code}";
   static const sendPassportData = "/new-passport-application";
+  static const sendDocData = "/new-passport-application-document";
+  static const makeSubmitTrue = "/new-passport-application/{id}/submit";
 
   // static const baseUrl = "http://5.75.142.45:8015";
 

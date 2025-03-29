@@ -49,7 +49,12 @@ abstract class PassportService {
   Future<List<BasedocumentCategoryType>> getdocumenttype(
     @Path("code") String code,
   );
-
   @POST(Constants.sendPassportData)
-  Future<PassportResponce> sendPassport({@Body() required FormData formData});
+  Future<PassportResponce> sendPassport(@Body() Map<String, dynamic> payload);
+
+  @POST(Constants.sendDocData)
+  Future sendPassportDoc({@Body() required FormData formData});
+
+  @POST(Constants.makeSubmitTrue)
+  Future makeSubmitTrue(@Path("id") String id);
 }

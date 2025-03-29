@@ -49,7 +49,7 @@ class SplashController extends GetxController {
       final isPhoneVerified = await AuthUtil().isUserPhoneVerified();
       if (isPhoneVerified) {
         Future.delayed(const Duration(seconds: 1), () {
-          Get.toNamed(Routes.NEW_PASSPORT);
+          Get.toNamed(Routes.MAIN_PAGE);
         });
       } else {
         Future.delayed(const Duration(seconds: 1), () {

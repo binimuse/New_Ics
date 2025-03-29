@@ -8,7 +8,8 @@ part 'base_document_type.g.dart';
 class BasedocumentCategoryType {
   const BasedocumentCategoryType({
     required this.id,
-
+    required this.documentCategory,
+    required this.documentType,
     required this.description,
     required this.document_category_id,
     required this.document_type_id,
@@ -21,10 +22,11 @@ class BasedocumentCategoryType {
       _$BasedocumentCategoryTypeFromJson(json);
 
   final String id;
-
-  final String description;
-  final String document_category_id;
-  final String document_type_id;
+  final DocumentCategory documentCategory;
+  final DocumentType documentType;
+  final dynamic description;
+  final dynamic document_category_id;
+  final dynamic document_type_id;
   final bool is_required;
   final bool draft;
   final String created_at;
@@ -33,15 +35,47 @@ class BasedocumentCategoryType {
 }
 
 @JsonSerializable()
-class AllowedFileTypes {
-  const AllowedFileTypes({required this.types});
+class DocumentCategory {
+  const DocumentCategory({
+    required this.id,
+    required this.name,
+    required this.description,
+    required this.name_json,
+    required this.description_json,
+  });
 
-  factory AllowedFileTypes.fromJson(Map<String, dynamic> json) =>
-      _$AllowedFileTypesFromJson(json);
+  factory DocumentCategory.fromJson(Map<String, dynamic> json) =>
+      _$DocumentCategoryFromJson(json);
 
-  final List<String> types;
+  final String id;
+  final String name;
+  final dynamic description;
+  final Json name_json;
+  final Json description_json;
 
-  Map<String, dynamic> toJson() => _$AllowedFileTypesToJson(this);
+  Map<String, dynamic> toJson() => _$DocumentCategoryToJson(this);
+}
+
+@JsonSerializable()
+class DocumentType {
+  const DocumentType({
+    required this.id,
+    required this.name,
+    required this.description,
+    required this.name_json,
+    required this.description_json,
+  });
+
+  factory DocumentType.fromJson(Map<String, dynamic> json) =>
+      _$DocumentTypeFromJson(json);
+
+  final String id;
+  final String name;
+  final dynamic description;
+  final Json name_json;
+  final Json description_json;
+
+  Map<String, dynamic> toJson() => _$DocumentTypeToJson(this);
 }
 
 @JsonSerializable()

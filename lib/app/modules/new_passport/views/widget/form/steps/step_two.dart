@@ -40,45 +40,87 @@ class Step2 extends StatelessWidget {
           initialValue: null,
         ),
         SizedBox(height: 2.h),
-        _buildDropdownField(
-          title: 'Hair Color'.tr,
-          items: controller.baseOccupation,
-          onChanged: (value) => controller.baseOccupationvalue.value = value,
+
+        FormBuilderDropdown(
+          decoration: ReusableInputDecoration.getDecoration(
+            'Hair Color'.tr,
+            isMandatory: false,
+          ),
+          items:
+              HairColor.values.map((HairColor color) {
+                return DropdownMenuItem<HairColor>(
+                  value: color,
+                  child: Text(color.name),
+                );
+              }).toList(),
+          onChanged: (newValue) {
+            controller.selectedHairColor.value = newValue;
+          },
+          name: 'Hair'.tr,
           initialValue: null,
         ),
+
         SizedBox(height: 2.h),
-        _buildDropdownField(
-          title: 'Eye Color'.tr,
-          items: controller.baseOccupation,
-          onChanged: (value) => controller.baseOccupationvalue.value = value,
+        FormBuilderDropdown(
+          decoration: ReusableInputDecoration.getDecoration(
+            'Eye Color'.tr,
+            isMandatory: false,
+          ),
+          items:
+              EyeColor.values.map((EyeColor color) {
+                return DropdownMenuItem<EyeColor>(
+                  value: color,
+                  child: Text(color.name),
+                );
+              }).toList(),
+          onChanged: (newValue) {
+            controller.selectedEyeColor.value = newValue;
+          },
+          name: 'Eye'.tr,
           initialValue: null,
         ),
+
         SizedBox(height: 2.h),
+
         FormBuilderDropdown(
           decoration: ReusableInputDecoration.getDecoration(
             'Skin Color'.tr,
             isMandatory: false,
           ),
           items:
-              controller.SkinColor.map((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(
-                    value,
-                    style: AppTextStyles.captionBold.copyWith(
-                      color: AppColors.grayDark,
-                    ),
-                  ),
+              SkinColor.values.map((SkinColor color) {
+                return DropdownMenuItem<SkinColor>(
+                  value: color,
+                  child: Text(color.name),
                 );
               }).toList(),
-          onChanged: (value) {
-            controller.skincolorvalue.value = value!;
+          onChanged: (newValue) {
+            controller.selectedSkinColor.value = newValue;
           },
           name: 'Skin'.tr,
           initialValue: null,
         ),
         SizedBox(height: 2.h),
-        _buildMaritalStatusDropdown(),
+
+        FormBuilderDropdown(
+          decoration: ReusableInputDecoration.getDecoration(
+            'Marital Status'.tr,
+            isMandatory: false,
+          ),
+          items:
+              MaritalStatus.values.map((MaritalStatus color) {
+                return DropdownMenuItem<MaritalStatus>(
+                  value: color,
+                  child: Text(color.name),
+                );
+              }).toList(),
+          onChanged: (newValue) {
+            controller.selectedMaritalStatus.value = newValue;
+          },
+
+          name: 'Marital'.tr,
+          initialValue: null,
+        ),
         SizedBox(height: 2.h),
         _buildHeightInputField(),
         SizedBox(height: 2.h),
@@ -136,15 +178,6 @@ class Step2 extends StatelessWidget {
           initialValue: initialValue,
         ),
       ],
-    );
-  }
-
-  Widget _buildMaritalStatusDropdown() {
-    return _buildDropdownField(
-      title: 'Marital Status'.tr,
-      items: controller.baseOccupation,
-      onChanged: (value) => controller.baseOccupationvalue.value = value,
-      initialValue: null,
     );
   }
 
